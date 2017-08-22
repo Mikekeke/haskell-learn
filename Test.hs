@@ -63,3 +63,19 @@ fibTail n | n == 0 = 0
           where
           fibLoop curr next iter | iter == 0 = curr + next
                                  | otherwise = fibLoop(next)(curr + next)(iter - 1)
+
+
+syntax1 a b =
+    let {x = 10; a1 = a + x; b1 = b + x}
+    in (a1, b1)
+
+syntax2 a b =
+    let
+      x = 10
+      a1 = half a + x
+      b1 = b + x
+      half = (/ 2)
+    in (a1, half b1)
+
+-- :set +s to print time and memory
+sample = (let x = 'w' in [x,'o',x]) ++ "!"
