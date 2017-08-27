@@ -1,6 +1,7 @@
 module Test where
 
 import Data.Char
+import Data.Function
 
 devideTwoBy = (2 /)
 devidedByTwo = (/ 2)
@@ -79,3 +80,58 @@ syntax2 a b =
 
 -- :set +s to print time and memory
 sample = (let x = 'w' in [x,'o',x]) ++ "!"
+
+fact5 n | n >= 0 = let
+          loop acc 0 = acc
+          loop acc n = loop (acc * n) (n - 1)
+        in loop 1 n
+        | otherwise = error "n >= 0 !"
+
+minusTupl :: Num a => (a, a) -> a
+minusTupl t =
+    let
+      (a,b) = t
+    in a - b
+
+sum'n'countMy :: Integer -> (Integer, Integer)
+sum'n'countMy x
+  |x == 0 = (1, 0)
+  |x > 0 = countNsum x 0 0
+  |x < 0 = sum'n'count (-x)
+  where
+    countNsum x1 sum cnt
+      |x1 == 0 = (sum, cnt)
+      |otherwise = countNsum (div x1 10) (sum + (mod x1 10)) (cnt + 1)
+
+
+sum'n'count :: Integer -> (Integer, Integer)
+sum'n'count x
+  | x == 0 = (0, 1)
+  | x < 0 = iter 0 0 (-x)
+  | otherwise = iter 0 0 x
+  where
+    iter sum count 0 = (sum, count)
+    iter sum count x = let
+        (x', d) = divMod x 10
+      in iter (sum + d) (count + 1) x'
+
+-- begin 1
+multSecond = g `on` h
+
+g :: Num a => a -> a -> a
+g a b = a * b
+
+h :: (a, b) -> b
+h tuple = snd tuple
+--GH?Ci> multSecond ('A',2) ('E',7)
+--14
+--end 1
+
+--begin 2
+on3 :: (b -> b -> b -> c) -> (a -> b) -> a -> a -> a -> c
+on3 op f x y z = op (f x) (f y) (f z)
+
+--GHCi> let sum3squares = (\x y z -> x+y+z) `on3` (^2)
+--GHCi> sum3squares 1 2 3
+--14
+--end 2
