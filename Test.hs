@@ -138,6 +138,13 @@ on3 op f x y z = op (f x) (f y) (f z)
 
 exclamate :: Char -> String
 exclamate s = s : '!' : []
-
 exclDigit :: Int -> String
 exclDigit = exclamate . chr
+
+doItYourself = f' . g' . h'
+f' = logBase 2
+g' = (^3)
+h' = max 42
+
+prefixTuple2 a b = (,) a b
+prefixTuple3 a b c = (,,) a b c
