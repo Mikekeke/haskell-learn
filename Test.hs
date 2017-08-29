@@ -135,3 +135,9 @@ on3 op f x y z = op (f x) (f y) (f z)
 --GHCi> sum3squares 1 2 3
 --14
 --end 2
+
+exclamate :: Char -> String
+exclamate s = s : '!' : []
+
+exclDigit :: Int -> String
+exclDigit = exclamate . chr
