@@ -1,3 +1,4 @@
+{-# LANGUAGE RankNTypes #-}
 module Test where
 
 import Data.Char
@@ -148,3 +149,12 @@ h' = max 42
 
 prefixTuple2 a b = (,) a b
 prefixTuple3 a b c = (,,) a b c
+
+a1 = 12
+b1 = 7.22
+c1 = 4.12
+d1 = 0.12
+ip = show a1 ++ show b1 ++ show c1 ++ show d1
+
+avg :: Int -> Int -> Int -> Double
+avg a b c = fromIntegral (a + b + c) / 3
