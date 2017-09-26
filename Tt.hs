@@ -1,0 +1,9 @@
+paths :: Int -> Int -> Int
+paths m n = go n 0
+    where
+        go h acc
+            |h == 0 = acc
+            |h == n - 1  = go (h - 1) (acc + m -1)
+            |h == n  = go (h - 1) (acc + 1)
+            |otherwise = go (h - 1) (acc + m)
+
