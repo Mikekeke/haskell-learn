@@ -14,3 +14,12 @@ tail'' (_ : xs) = xs
 
 second3 (_ : xs) = head xs
 second4 (_ : x : _) = x
+
+concat' :: [a] -> [a] -> [a]
+-- can pattern match like this
+[] `concat'` ys = ys
+(x:xs) `concat'` ys = x : xs `concat'` ys
+
+isEmpty :: [a] -> Bool
+isEmpty [] = True
+isEmpty _ = False
