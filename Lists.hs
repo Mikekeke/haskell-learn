@@ -65,7 +65,7 @@ reverse'' l =
 isPalindromeMy :: Eq a => [a] -> Bool
 isPalindromeMy [] = True
 isPalindromeMy [x] = True
-isPalindromeMy (x:xs) = (x == last xs) && isPalindrome (init xs)
+isPalindromeMy (x:xs) = (x == last xs) && isPalindromeMy (init xs)
 
 -- missed this again lol
 isPalindrome1 :: (Eq a) => [a] -> Bool
@@ -73,4 +73,4 @@ isPalindrome1 xs = xs == (reverse xs)
 
 isPalindrome2 []  = True
 isPalindrome2 [_] = True
-isPalindrome2 xs  = (head xs) == (last xs) && (isPalindrome' $ init $ tail xs)
+isPalindrome2 xs  = (head xs) == (last xs) && (isPalindrome2 $ init $ tail xs)
