@@ -74,3 +74,30 @@ isPalindrome1 xs = xs == (reverse xs)
 isPalindrome2 []  = True
 isPalindrome2 [_] = True
 isPalindrome2 xs  = (head xs) == (last xs) && (isPalindrome2 $ init $ tail xs)
+
+zip' :: [a] -> [b] -> [(a,b)]
+zip' [] _ = []
+zip' _ [] = []
+zip' (x:xs)(y:ys) = (x,y) : zip' xs ys
+
+zip'' :: [a] -> [b] -> [(a,b)]
+zip'' (x:xs)(y:ys) = (x,y) : zip' xs ys
+zip'' _ _ = []
+
+unzip' :: [(a,b)] -> ([a],[b])
+unzip' [] = ([],[])
+unzip' ((x,y):xys) =
+  let (xs,ys) = unzip' xys
+  in(x:xs, y:ys)
+
+sum3 :: Num a => [a] -> [a] -> [a] -> [a]
+sum3 a b c =
+  let
+    take' [] = 0
+    take' (x:xs) = x
+    tail' (x:xs) = xs
+    tail' _ = []
+    hSum l1 l2 l3= (take' l1) + (take' l2) + (take' l3)
+  in
+    [hSum a b c] ++ sum3 (tail' a) (tail' b) (tail' c)
+

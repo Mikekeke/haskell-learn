@@ -158,3 +158,7 @@ ip = show a1 ++ show b1 ++ show c1 ++ show d1
 
 avg :: Int -> Int -> Int -> Double
 avg a b c = fromIntegral (a + b + c) / 3
+
+
+take' [] = 0
+take' (x:xs) = x
