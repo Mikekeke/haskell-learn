@@ -162,3 +162,5 @@ avg a b c = fromIntegral (a + b + c) / 3
 
 take' [] = 0
 take' (x:xs) = x
+
+

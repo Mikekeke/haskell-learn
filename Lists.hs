@@ -90,8 +90,9 @@ unzip' ((x,y):xys) =
   let (xs,ys) = unzip' xys
   in(x:xs, y:ys)
 
-sum3 :: Num a => [a] -> [a] -> [a] -> [a]
-sum3 a b c =
+sum3my :: Num a => [a] -> [a] -> [a] -> [a]
+sum3my [] [] [] = []
+sum3my a b c =
   let
     take' [] = 0
     take' (x:xs) = x
@@ -99,5 +100,41 @@ sum3 a b c =
     tail' _ = []
     hSum l1 l2 l3= (take' l1) + (take' l2) + (take' l3)
   in
-    [hSum a b c] ++ sum3 (tail' a) (tail' b) (tail' c)
+    [hSum a b c] ++ sum3my (tail' a) (tail' b) (tail' c)
 
+sum3 :: Num a => [a] -> [a] -> [a] -> [a]
+sum3 [] [] [] = []
+sum3 [] ys zs = sum3 [0] ys zs
+sum3 xs [] zs = sum3 xs [0] zs
+sum3 xs ys [] = sum3 xs ys [0]
+sum3 (x:xs) (y:ys) (z:zs) = x+y+z : sum3 xs ys zs
+
+groupElems :: Eq a => [a] -> [[a]]
+groupElems [] = []
+groupElems l =
+    let
+        (xs, rest) = span(== head l) l
+    in
+        xs : groupElems rest
+
+-- groupElems2 :: Eq a => [a] -> [[a]]
+-- groupElems2 [] = []
+-- groupElems2 [x] = [[x]]
+-- groupElems2 (x:xs)
+--
+--
+--
+-- go (x:y:t)
+--     | x == y = x : go (y:t)
+--     | otherwise = x : []
+
+groupElems3 :: Eq a => [a] -> [[a]]
+groupElems3 [] = []
+groupElems3 [x] = [[x]]
+groupElems3 (x:xs)
+ | x == head xs =
+    let
+        (r:rs) = groupElems xs
+    in
+        (x : r) : rs
+ | otherwise = [x] : groupElems3 xs

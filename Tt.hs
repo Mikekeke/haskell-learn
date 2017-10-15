@@ -7,3 +7,8 @@ paths m n = go n 0
             |h == n  = go (h - 1) (acc + 1)
             |otherwise = go (h - 1) (acc + m)
 
+
+
+sf :: String -> String
+sf "shit" = "fuck"
+sf rest = rest
