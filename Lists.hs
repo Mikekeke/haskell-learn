@@ -109,13 +109,13 @@ sum3 xs [] zs = sum3 xs [0] zs
 sum3 xs ys [] = sum3 xs ys [0]
 sum3 (x:xs) (y:ys) (z:zs) = x+y+z : sum3 xs ys zs
 
-groupElems :: Eq a => [a] -> [[a]]
-groupElems [] = []
-groupElems l =
+groupElemsMy :: Eq a => [a] -> [[a]]
+groupElemsMy [] = []
+groupElemsMy l =
     let
         (xs, rest) = span(== head l) l
     in
-        xs : groupElems rest
+        xs : groupElemsMy rest
 
 -- groupElems2 :: Eq a => [a] -> [[a]]
 -- groupElems2 [] = []
@@ -134,7 +134,12 @@ groupElems3 [x] = [[x]]
 groupElems3 (x:xs)
  | x == head xs =
     let
-        (r:rs) = groupElems xs
+        (r:rs) = groupElems3 xs
     in
         (x : r) : rs
  | otherwise = [x] : groupElems3 xs
+
+take' :: Int -> [a] -> [a]
+take' n _ | n <= 0 = []
+take' _ []         = []
+take' n (x:xs)     = x : take (n-1) xs
