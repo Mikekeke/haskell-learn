@@ -128,6 +128,8 @@ groupElemsMy l =
 --     | x == y = x : go (y:t)
 --     | otherwise = x : []
 
+
+--FIGURE OUT!
 groupElems3 :: Eq a => [a] -> [[a]]
 groupElems3 [] = []
 groupElems3 [x] = [[x]]
@@ -138,8 +140,27 @@ groupElems3 (x:xs)
     in
         (x : r) : rs
  | otherwise = [x] : groupElems3 xs
+--FIGURE OUT!
 
 take' :: Int -> [a] -> [a]
 take' n _ | n <= 0 = []
 take' _ []         = []
 take' n (x:xs)     = x : take (n-1) xs
+
+filter' :: (a -> Bool) -> [a] -> [a]
+filter' _ [] = []
+filter' p (x:xs)
+  | p x = x : filter' p xs
+  | otherwise = filter' p xs
+
+takeWhile' :: (a -> Bool) -> [a] -> [a]
+takeWhile' _ [] = []
+takeWhile' p (x:xs)
+  | p x = x : takeWhile' p xs
+  | otherwise = []
+
+dropWhile' :: (a -> Bool) -> [a] -> [a]
+dropWhile' _ [] = []
+dropWhile' p l@(x:xs)
+  | p x = dropWhile' p xs
+  | otherwise = l
