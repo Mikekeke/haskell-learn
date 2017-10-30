@@ -184,11 +184,5 @@ filterDisj2 :: (a -> Bool) -> (a -> Bool) -> [a] -> [a]
 filterDisj2 p1 p2 = filter (\x -> p1 x || p2 x)
 
 qsort :: Ord a => [a] -> [a]
-qsort l@(x:[]) = l
-qsort l@(x:xs) =
-  let
-    left = filter (< x) xs
-    right = filter (> x) xs
-    safe l = if left == [] then [x] else l
-  in
-    (qsort (safe left)) ++ (qsort right)
+qsort [] = []
+qsort l@(x:xs) = (qsort $ filter (< x) xs) ++ [x] ++ (qsort $ filter (> x) xs)
