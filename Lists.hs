@@ -1,3 +1,5 @@
+import Data.Char
+
 nTimes n times
     | times == 0 = []
     | otherwise = n : nTimes n (times - 1)
@@ -164,3 +166,29 @@ dropWhile' _ [] = []
 dropWhile' p l@(x:xs)
   | p x = dropWhile' p xs
   | otherwise = l
+
+readDigitsMy  :: String -> (String, String)
+readDigitsMy [] = ("","")
+readDigitsMy s = span isDigit s
+
+readDigits  :: String -> (String, String)
+readDigits = span isDigit
+
+filterDisj :: (a -> Bool) -> (a -> Bool) -> [a] -> [a]
+filterDisj a b [] = []
+filterDisj p1 p2 (x:xs)
+  | (p1 x) || (p2 x) = x : filterDisj p1 p2 xs
+  | otherwise = filterDisj p1 p2 xs
+
+filterDisj2 :: (a -> Bool) -> (a -> Bool) -> [a] -> [a]
+filterDisj2 p1 p2 = filter (\x -> p1 x || p2 x)
+
+qsort :: Ord a => [a] -> [a]
+qsort l@(x:[]) = l
+qsort l@(x:xs) =
+  let
+    left = filter (< x) xs
+    right = filter (> x) xs
+    safe l = if left == [] then [x] else l
+  in
+    (qsort (safe left)) ++ (qsort right)
