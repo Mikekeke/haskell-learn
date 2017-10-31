@@ -185,4 +185,28 @@ filterDisj2 p1 p2 = filter (\x -> p1 x || p2 x)
 
 qsort :: Ord a => [a] -> [a]
 qsort [] = []
-qsort l@(x:xs) = (qsort $ filter (< x) xs) ++ [x] ++ (qsort $ filter (> x) xs)
+qsort l@(x:xs) = (qsort $ filter (< x) xs) ++ (filter (==x) l) ++ (qsort $ filter (> x) xs)
+
+--using dots composing example from stepik
+qsortOther :: Ord a => [a] -> [a]
+qsortOther [] = []
+qsortOther xs@(x:xs') = ltx xs' ++ eqx xs ++ gtx xs' where
+    ltx = qsortOther . filter (<x)
+    gtx = qsortOther . filter (>x)
+    eqx = filter (==x)
+
+--dotted
+concatMap' :: (a -> [b]) -> [a] -> [b]
+concatMap' f = concat . map f
+
+--not dotted
+concatMap'' :: (a -> [b]) -> [a] -> [b]
+concatMap'' f xs = concat (map f xs)
+--ex: concatMap (\x -> [x+10, x*10]) [1,2,3]
+
+squares'n'cubes :: Num a => [a] -> [a]
+squares'n'cubes = concatMap (\x->[x^2, x ^3])
+
+squares'n'cubesRec :: Num a => [a] -> [a]
+squares'n'cubesRec [] = []
+squares'n'cubesRec (x:xs) = x^2 : x^3 : squares'n'cubesRec xs
