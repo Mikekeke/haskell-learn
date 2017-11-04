@@ -12,3 +12,10 @@ paths m n = go n 0
 sf :: String -> String
 sf "shit" = "fuck"
 sf rest = rest
+
+
+bold :: String -> String
+bold s = "<b>" ++ s ++ "</b>"
+ital s = "<i>" ++ s ++ "</i>"
+form = ital . bold
+

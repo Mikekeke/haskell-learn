@@ -210,3 +210,8 @@ squares'n'cubes = concatMap (\x->[x^2, x ^3])
 squares'n'cubesRec :: Num a => [a] -> [a]
 squares'n'cubesRec [] = []
 squares'n'cubesRec (x:xs) = x^2 : x^3 : squares'n'cubesRec xs
+
+
+perms :: [a] -> [[a]]
+perms []= [[]]
+perms l = concatMap (map )

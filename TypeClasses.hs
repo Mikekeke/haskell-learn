@@ -59,3 +59,22 @@ class (Bounded a, Show a) => TestBnd a where
 
 instance TestBnd Bool
 instance TestBnd Int
+
+class (Num a) => TellType a where
+    tell :: a -> String
+
+instance TellType Integer where
+    tell a = "Integer"
+
+instance TellType Float where
+    tell a = "Float"
+
+instance TellType Double where
+    tell a = "Double"
+
+instance TellType Bool where
+    tell a = "Bool"
+--to get it working with type annotation need to call like "tell (4 :: Float)"
+--coz "tell 4 :: Float" tries to get return type Float, not passing "4" as Float
+
+
