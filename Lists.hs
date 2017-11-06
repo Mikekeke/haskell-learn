@@ -211,7 +211,22 @@ squares'n'cubesRec :: Num a => [a] -> [a]
 squares'n'cubesRec [] = []
 squares'n'cubesRec (x:xs) = x^2 : x^3 : squares'n'cubesRec xs
 
+delAllUpper :: String -> String
+delAllUpper = unwords . filter (any isLower) . words
 
-perms :: [a] -> [[a]]
-perms []= [[]]
-perms l = concatMap (map )
+-- perms :: [a] -> [[a]]
+-- perms []= [[]]
+-- perms l = concatMap (map )
+
+-- swp :: [a] -> [[a]]
+-- swp [] = [[]]
+-- swp (x:[]) = [[x]]
+-- swp (x1:x2:[]) = [[x2, x1]]
+-- swp (x1:x2:xs) = [[x2, x1], [x1, swp (x2:xs)], [x2, swp(x1:xs)]]
+
+max3My :: Ord a => [a] -> [a] -> [a] -> [a]
+max3My = zipWith3 (\a b c -> maximum [a,b,c])
+
+max3Other :: Ord a => [a] -> [a] -> [a] -> [a]
+max3Other = zipWith3 ((max .) . max)
+
