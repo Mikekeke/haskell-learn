@@ -230,3 +230,9 @@ max3My = zipWith3 (\a b c -> maximum [a,b,c])
 max3Other :: Ord a => [a] -> [a] -> [a] -> [a]
 max3Other = zipWith3 ((max .) . max)
 
+and' [] = True
+and' (x:xs) = x && and' xs
+
+forall' :: (a -> Bool) -> [a] -> Bool
+forall' p = and' . map p
+
