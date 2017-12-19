@@ -19,3 +19,5 @@ sumOdd' = foldr f 0 where
 
 sumOdd'' :: [Integer] -> Integer
 sumOdd'' = foldr (+) 0 . filter odd
+
+filter (\x -> foldr (-) x [2,1,5] == foldl (-) x [2,1,5]) [0..10000]
