@@ -7,7 +7,7 @@ class Printable a where
 
 instance Printable Bool where
   toString True = "true"
-  toString _ = "false"
+  toString _ = "false" -- for instance Printable ()
 
 instance Printable ()
 
@@ -60,7 +60,7 @@ class (Bounded a, Show a) => TestBnd a where
 instance TestBnd Bool
 instance TestBnd Int
 
-class (Num a) => TellType a where
+class (Show a) => TellType a where
     tell :: a -> String
 
 instance TellType Integer where

@@ -9,7 +9,10 @@ class DeNotated a where
     denotation _ = "empty denot"
 
 class (Notated a, DeNotated a) => Combined a where
+    comb :: a -> String
+    comb a = (denotation a) ++ " " ++ (notation a)
 
 instance Notated Bool -- без этих интсансов не работает
 instance DeNotated Bool -- без этих интсансов не работает
-instance Combined Bool
+instance Combined Bool where
+

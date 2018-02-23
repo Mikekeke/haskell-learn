@@ -214,15 +214,19 @@ squares'n'cubesRec (x:xs) = x^2 : x^3 : squares'n'cubesRec xs
 delAllUpper :: String -> String
 delAllUpper = unwords . filter (any isLower) . words
 
--- perms :: [a] -> [[a]]
--- perms []= [[]]
--- perms l = concatMap (map )
+perms :: (Eq a) => [a] -> [[a]]
+perms []= [[]]
+perms (x:[])= [[x]]
+perms l = concatMap (\x -> map (\xs -> x:xs) (perms(filter (/=x) l))) l
 
--- swp :: [a] -> [[a]]
--- swp [] = [[]]
--- swp (x:[]) = [[x]]
--- swp (x1:x2:[]) = [[x2, x1]]
--- swp (x1:x2:xs) = [[x2, x1], [x1, swp (x2:xs)], [x2, swp(x1:xs)]]
+
+perms' :: [a] -> [[a]]
+perms' [] = [[]]
+perms' [x] = [[x]]
+perms' (x:xs) = concatMap (insertElem x) (perms' xs) where
+			insertElem x [] = [[x]]
+			insertElem x yss@(y:ys) = (x:yss) : map (y:) (insertElem x ys)
+
 
 max3My :: Ord a => [a] -> [a] -> [a] -> [a]
 max3My = zipWith3 (\a b c -> maximum [a,b,c])
@@ -230,9 +234,14 @@ max3My = zipWith3 (\a b c -> maximum [a,b,c])
 max3Other :: Ord a => [a] -> [a] -> [a] -> [a]
 max3Other = zipWith3 ((max .) . max)
 
-and' [] = True
-and' (x:xs) = x && and' xs
 
-forall' :: (a -> Bool) -> [a] -> Bool
-forall' p = and' . map p
+-- didn't solve myself
+coins = [2,3]
+-- change :: (Ord a, Num a) => a -> [[a]]
+change n | n < 0     = []
+         | n == 0    = [[]]
+         | otherwise = [ x : xs | x <- coins, xs <- change (n - x) ]
 
+change1 n
+  | n <= 0 = [[]]
+  | otherwise = [coin : m | coin <- coins, coin <= n, m <- change1 (n - coin)]
