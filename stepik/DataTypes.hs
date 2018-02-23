@@ -35,12 +35,12 @@ data LogLevel = Error | Warning | Info
 -- my cmp
 cmp :: LogLevel -> LogLevel -> Ordering
 cmp Error Warning = GT
-cmp Warning Info = GT
-cmp Error Info = GT
-cmp Info Warning = LT
+cmp Warning Info  = GT
+cmp Error Info    = GT
+cmp Info Warning  = LT
 cmp Warning Error = LT
-cmp Info Error = LT
-cmp _ _ = EQ
+cmp Info Error    = LT
+cmp _ _           = EQ
 
 -- other cmp
 -- instance Enum LogLevel where
@@ -56,9 +56,9 @@ cmp _ _ = EQ
 -- another cmp
 cmp'' :: LogLevel -> LogLevel -> Ordering
 cmp'' x y = compare (ord'' x)  (ord'' y) where
-   ord'' Error = 3
+   ord'' Error   = 3
    ord'' Warning = 2
-   ord'' Info = 1
+   ord'' Info    = 1
 
 --
 data Point = Point Double Double
@@ -80,11 +80,11 @@ data Shape = Circle Double | Rectangle Double Double
 
 area :: Shape -> Double
 area (Rectangle a b) = a*b
-area (Circle r) = pi * r^2
+area (Circle r)      = pi * r^2
 --or
 area' :: Shape -> Double
 area' s = case s of
-            (Circle r) -> pi*r^2
+            (Circle r)      -> pi*r^2
             (Rectangle x y) -> x*y
 
 square :: Double -> Shape
@@ -92,7 +92,7 @@ square a = Rectangle a a
 
 isSquare :: Shape -> Bool
 isSquare (Rectangle a b) = a == b
-isSquare _ = False
+isSquare _               = False
 
 --pattern guard
 isSquare' :: Shape -> Bool
