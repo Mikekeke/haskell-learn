@@ -8,6 +8,11 @@ slice n l = splitAt n l & \(a, b) -> a : slice n b
 
 -- b not in scope for "slice n b"
 -- slice2 n l = ((\(a, b) -> a)(splitAt n l)) : slice n b
+tt :: Int -> [a] -> [a]
+tt n l = fst (splitAt n l)
+
+-- O_o
+ttPoitfree = (fst .) . splitAt
 
 
 res1 :: [Integer]
