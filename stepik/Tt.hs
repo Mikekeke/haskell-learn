@@ -1,4 +1,5 @@
 module Tt where
+import           Data.Function
 import           Data.List
 
 t1 :: (Integer, Integer) -> [Integer]
