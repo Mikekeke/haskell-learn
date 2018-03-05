@@ -1,5 +1,6 @@
 module Essential where
 
+
 import           Data.Function
 
 -- & == flip($)
@@ -22,3 +23,6 @@ res2 :: [Integer]
 res2 = foldr (\x-> map (+x)) [0, 10] [1..5]
 keepInMind :: Integer -> [Integer] -> [Integer]
 keepInMind = \x-> map (+x)
+
+ff :: Int -> String
+ff x = x+x
