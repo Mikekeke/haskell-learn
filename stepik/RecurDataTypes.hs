@@ -82,10 +82,13 @@ data Expr = Val Int | Expr :+: Expr | Expr :*: Expr
 
 expand :: Expr -> Expr
 -- expand ((e1 :+: e2) :*: e) = expand e1 :*: expand e :+: expand e2 :*: expand e
--- expand (e :*: (e1 :+: e2)) = expand e :*: expand e1 :+: expand e :*: expand e2
+expand ((e1 :+: e2) :*: e) = case e of
+    ee@(Val _) -> expand e1 :*: ee :+: expand e2 :*: ee
+    
+    
+expand (e :*: (e1 :+: e2)) = expand e :*: expand e1 :+: expand e :*: expand e2
 expand (e1 :+: e2) = expand e1 :+: expand e2
-expand (Val a :*: Val b) = Val a :*: Val b
-expand (e1 :*: e2) = Val 100
+expand (e1 :*: e2) = expand e1 :*: expand e2
 expand e = e
 
 tst = (Val 1 :+: Val 2 :+: Val 3) :*: (Val 4 :+: Val 5)
