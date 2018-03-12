@@ -1,4 +1,5 @@
 module RecurDataTypes where
+import Debug.Trace
 
 --LIST
 data List a = Nil | Cons a (List a)
@@ -80,17 +81,33 @@ infixl 7 :*:
 data Expr = Val Int | Expr :+: Expr | Expr :*: Expr
     deriving (Show, Eq)
 
+ttt :: Expr -> Int
+ttt v@(Val _) = 33
+
+--just made it work
 expand :: Expr -> Expr
--- expand ((e1 :+: e2) :*: e) = expand e1 :*: expand e :+: expand e2 :*: expand e
-expand ((e1 :+: e2) :*: e) = case e of
-    ee@(Val _) -> expand e1 :*: ee :+: expand e2 :*: ee
-    
-    
-expand (e :*: (e1 :+: e2)) = expand e :*: expand e1 :+: expand e :*: expand e2
+expand ((e1 :+: e2) :*: e) = expand (expand e1 :*: expand e) :+: expand (expand e2 :*: expand e)
+expand (e :*: (e1 :+: e2)) = expand (expand e :*: expand e1) :+: expand (expand e :*: expand e2)
+expand (e1 :*: e2)
+        | e1 == expand e1 && e2 == expand e2 = expand e1 :*: expand e2
+        | otherwise = expand (expand e1 :*: expand e2)
 expand (e1 :+: e2) = expand e1 :+: expand e2
-expand (e1 :*: e2) = expand e1 :*: expand e2
 expand e = e
 
-tst = (Val 1 :+: Val 2 :+: Val 3) :*: (Val 4 :+: Val 5)
-correct = Val 1 :*: Val 4 :+: (Val 1 :*: Val 5 :+: (Val 2 :*: Val 4 :+: (Val 2 :*: Val 5 :+: (Val 3 :*: Val 4 :+: Val 3 :*: Val 5))))
-check = expand tst == expand correct 
+--some better solutions
+--course stuff
+expand' :: Expr -> Expr
+expand' = foldr1 (:+:) . expandList
+  where
+    expandList :: Expr -> [Expr]
+    expandList (Val i)   = [Val i]
+    expandList (l :+: r) = expandList l ++ expandList r
+    expandList (l :*: r) = [ e1 :*: e2 | e1 <- expandList l, e2 <- expandList r]
+
+--factor out equation
+expand2 = until (\x -> expand2' x == x) expand2'
+expand2' ((e1 :+: e2) :*: e) = expand2 e1 :*: expand2 e :+: expand2 e2 :*: expand2 e
+expand2' (e :*: (e1 :+: e2)) = expand2 e :*: expand2 e1 :+: expand2 e :*: expand2 e2
+expand2' (e1 :+: e2) = expand2 e1 :+: expand2 e2
+expand2' (e1 :*: e2) = expand2 e1 :*: expand2 e2
+expand2' e = e
