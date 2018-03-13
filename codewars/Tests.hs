@@ -5,6 +5,7 @@ import           Data.List
 import           Data.Ord
 import           GHC.Exts
 import           Text.Printf
+import Debug.Trace
 
 printerError :: [Char] -> [Char]
 printerError s =
@@ -39,3 +40,14 @@ longestConsec strarr k
       grpHelper l
         | k > (length l) = []
         | otherwise = (concat $ take k l) : grpHelper (tail l)
+
+
+-- ************************************************
+toFeetsPerSec = (0.0002778 * )
+-- race :: Int -> Int -> Int -> Maybe (Int, Int, Int)
+race v1 v2 g = tick g 0 0 where
+    s1 = toFeetsPerSec v1
+    s2 = toFeetsPerSec v2
+    tick d1 d2 time | d2 >= d1 = time
+                    | otherwise = tick (d1 + s1) (d2 + s2) (time + 1)
+
