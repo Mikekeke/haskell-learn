@@ -13,3 +13,6 @@ f3 x = f2(f1 x)
 
 ff2 :: [Integer]
 ff2 = map (+1)([1,2,3])
+
+
+
