@@ -1,5 +1,5 @@
-import Prelude hiding (lookup)
-import qualified Data.List as L --haha, even compiler tried to help me, worthless (see smarter waraint)
+import qualified Data.List as L
+import           Prelude   hiding (lookup)
 
 class MapLike m where
     empty :: m k v
@@ -7,7 +7,7 @@ class MapLike m where
     insert :: Ord k => k -> v -> m k v -> m k v
     delete :: Ord k => k -> m k v -> m k v
     fromList :: Ord k => [(k,v)] -> m k v
-    fromList [] = empty
+    fromList []         = empty
     fromList ((k,v):xs) = insert k v (fromList xs)
 
 newtype ListMap k v = ListMap { getListMap :: [(k,v)] }
@@ -18,14 +18,16 @@ instance MapLike ListMap where
     empty = ListMap []
 
     lookup _ (ListMap []) = Nothing
-    lookup key (ListMap ((k,v):kvs)) = if key == k then Just v else lookup key (ListMap kvs)
+    lookup key (ListMap ((k,v):kvs))
+        | key == k = Just v
+        | otherwise = lookup key (ListMap kvs)
 
     insert key val (ListMap l) = ListMap $ insList l where
         insList [] = [(key,val)]
         insList (kv:kvs) = if key == fst kv then (key, val):kvs else kv : insList kvs
 
     delete key (ListMap l) = ListMap $ delInList l where
-        delInList [] = []
+        delInList []       = []
         delInList (kv:kvs) = if key == fst kv then kvs else kv : delInList kvs
 
 -- not my smarter one
@@ -34,3 +36,5 @@ instance MapLike ListMap where
 --     lookup key (ListMap list) = L.lookup key list
 --     insert key value map  = ListMap $ (key, value) : (getListMap $ delete key map)
 --     delete key (ListMap list)  = ListMap $ filter (\ (x, _) -> x /= key) list
+
+
