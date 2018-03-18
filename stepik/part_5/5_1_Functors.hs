@@ -17,3 +17,22 @@ module Functors where
     instance Functor Tree where
         fmap f (Leaf m)       = Leaf $ fmap f m
         fmap f (Branch l m r) = Branch (fmap f l) (fmap f m) (fmap f r)
+
+-- *************************************************
+    data Entry k1 k2 v = Entry (k1, k2) v  deriving Show
+    data Map k1 k2 v = Map [Entry k1 k2 v]  deriving Show
+
+
+
+    instance Functor (Entry k1 k2) where
+        fmap f (Entry (k1, k2) v) = (Entry (k1, k2) (f v))
+
+    instance Functor (Map k1 k2) where
+        fmap _ (Map []) = Map []
+        fmap f (Map es) = Map $ map (fmap f) es
+
+
+    -- for kinds "* -> * -> *" need to use it to one type to ger * -> * with which functor can work, e.g.
+    -- instance Functor ((,) s) where
+    --     fmap f (x,y) = (x, f y)
+    -- it wiil work only with second value in tuple

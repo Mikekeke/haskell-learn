@@ -1,4 +1,4 @@
-import Data.Char
+import           Data.Char
 
 nTimes n times
     | times == 0 = []
@@ -24,7 +24,7 @@ concat' :: [a] -> [a] -> [a]
 
 isEmpty :: [a] -> Bool
 isEmpty [] = True
-isEmpty _ = False
+isEmpty _  = False
 
 oddsOnly :: Integral a => [a] -> [a]
 oddsOnly [] = []
@@ -40,33 +40,36 @@ init' (x:[]) = []
 init' (x:xs) = x : init' xs
 
 sum' :: (Num a) => [a] -> a
-sum' [] = 0
-sum' [x] = x
+sum' []     = 0
+sum' [x]    = x
 sum' (x:xs) = x + sum' xs
 
 maxIn :: (Ord a) => [a] -> a
-maxIn [] = error "Empty list"
-maxIn [x] = x
+maxIn []     = error "Empty list"
+maxIn [x]    = x
 maxIn (x:xs) = x `max` maxIn xs
 
 reverse' :: [a] -> [a]
-reverse' [] = []
+reverse' []  = []
 reverse' [x] = [x]
-reverse' xs = (last xs) : reverse' (init xs)
+reverse' xs  = (last xs) : reverse' (init xs)
 
 reverse'' :: [a] -> [a]
 reverse'' [] = []
 reverse'' [x] = [x]
 reverse'' l =
     let
-        go [] acc = acc
+        go [] acc     = acc
         go (x:xs) acc = go  xs (x : acc)
     in
         go l []
 
+reverse''' :: [a] -> [a]
+reverse'''  = foldl (flip (:)) []
+
 isPalindromeMy :: Eq a => [a] -> Bool
-isPalindromeMy [] = True
-isPalindromeMy [x] = True
+isPalindromeMy []     = True
+isPalindromeMy [x]    = True
 isPalindromeMy (x:xs) = (x == last xs) && isPalindromeMy (init xs)
 
 -- missed this again lol
@@ -78,13 +81,13 @@ isPalindrome2 [_] = True
 isPalindrome2 xs  = (head xs) == (last xs) && (isPalindrome2 $ init $ tail xs)
 
 zip' :: [a] -> [b] -> [(a,b)]
-zip' [] _ = []
-zip' _ [] = []
+zip' [] _         = []
+zip' _ []         = []
 zip' (x:xs)(y:ys) = (x,y) : zip' xs ys
 
 zip'' :: [a] -> [b] -> [(a,b)]
 zip'' (x:xs)(y:ys) = (x,y) : zip' xs ys
-zip'' _ _ = []
+zip'' _ _          = []
 
 unzip' :: [(a,b)] -> ([a],[b])
 unzip' [] = ([],[])
@@ -96,19 +99,19 @@ sum3my :: Num a => [a] -> [a] -> [a] -> [a]
 sum3my [] [] [] = []
 sum3my a b c =
   let
-    take' [] = 0
+    take' []     = 0
     take' (x:xs) = x
     tail' (x:xs) = xs
-    tail' _ = []
+    tail' _      = []
     hSum l1 l2 l3= (take' l1) + (take' l2) + (take' l3)
   in
     [hSum a b c] ++ sum3my (tail' a) (tail' b) (tail' c)
 
 sum3 :: Num a => [a] -> [a] -> [a] -> [a]
-sum3 [] [] [] = []
-sum3 [] ys zs = sum3 [0] ys zs
-sum3 xs [] zs = sum3 xs [0] zs
-sum3 xs ys [] = sum3 xs ys [0]
+sum3 [] [] []             = []
+sum3 [] ys zs             = sum3 [0] ys zs
+sum3 xs [] zs             = sum3 xs [0] zs
+sum3 xs ys []             = sum3 xs ys [0]
 sum3 (x:xs) (y:ys) (z:zs) = x+y+z : sum3 xs ys zs
 
 groupElemsMy :: Eq a => [a] -> [[a]]
@@ -145,9 +148,9 @@ groupElems3 (x:xs)
 --FIGURE OUT!
 
 take' :: Int -> [a] -> [a]
-take' n _ | n <= 0 = []
-take' _ []         = []
-take' n (x:xs)     = x : take (n-1) xs
+take' n _      | n <= 0 = []
+take' _ []     = []
+take' n (x:xs) = x : take (n-1) xs
 
 filter' :: (a -> Bool) -> [a] -> [a]
 filter' _ [] = []
@@ -169,7 +172,7 @@ dropWhile' p l@(x:xs)
 
 readDigitsMy  :: String -> (String, String)
 readDigitsMy [] = ("","")
-readDigitsMy s = span isDigit s
+readDigitsMy s  = span isDigit s
 
 readDigits  :: String -> (String, String)
 readDigits = span isDigit
@@ -208,25 +211,25 @@ squares'n'cubes :: Num a => [a] -> [a]
 squares'n'cubes = concatMap (\x->[x^2, x ^3])
 
 squares'n'cubesRec :: Num a => [a] -> [a]
-squares'n'cubesRec [] = []
+squares'n'cubesRec []     = []
 squares'n'cubesRec (x:xs) = x^2 : x^3 : squares'n'cubesRec xs
 
 delAllUpper :: String -> String
 delAllUpper = unwords . filter (any isLower) . words
 
 perms :: (Eq a) => [a] -> [[a]]
-perms []= [[]]
-perms (x:[])= [[x]]
-perms l = concatMap (\x -> map (\xs -> x:xs) (perms(filter (/=x) l))) l
+perms []=    [[]]
+perms (x:[])=[[x]]
+perms l      = concatMap (\x -> map (\xs -> x:xs) (perms(filter (/=x) l))) l
 
 
 -- didn't solve myself
-perms' :: [a] -> [[a]]
-perms' [] = [[]]
-perms' [x] = [[x]]
-perms' (x:xs) = concatMap (insertElem x) (perms' xs) where
-     		insertElem x [] = [[x]]
-			insertElem x yss@(y:ys) = (x:yss) : map (y:) (insertElem x ys)
+-- perms' :: [a] -> [[a]]
+-- perms' [] = [[]]
+-- perms' [x] = [[x]]
+-- perms' (x:xs) = concatMap (insertElem x) (perms' xs) where
+--      		insertElem x [] = [[x]]
+-- 			insertElem x yss@(y:ys) = (x:yss) : map (y:) (insertElem x ys)
 
 
 max3My :: Ord a => [a] -> [a] -> [a] -> [a]
