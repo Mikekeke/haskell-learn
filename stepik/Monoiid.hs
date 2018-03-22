@@ -1,5 +1,7 @@
 module Monoiid where
 
+import Data.Monoid
+
 newtype Xor = Xor { getXor :: Bool }
     deriving (Eq,Show)
 
@@ -43,3 +45,10 @@ instance Monoid a => Monoid (Maybe' a) where
 --делают решение неверным? Это ведь фактически определение пустого элемента.
 
 --Потому что `mempty` это всего лишь идентификатор, вы там могли что угодно написать, хоть `mempty`, хоть `x`, хоть `foobar`.
+
+-- some poithful tests
+fs = [(+3), (+10)]
+f1 x = appEndo (mconcat $ (map Endo fs)) x
+f2 x = foldl1 fmap fs x
+f3 x = appEndo (foldMap Endo fs) x
+test x = map ($ x) [f1, f2, f3]
