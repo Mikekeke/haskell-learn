@@ -224,12 +224,12 @@ perms l      = concatMap (\x -> map (\xs -> x:xs) (perms(filter (/=x) l))) l
 
 
 -- didn't solve myself
--- perms' :: [a] -> [[a]]
--- perms' [] = [[]]
--- perms' [x] = [[x]]
--- perms' (x:xs) = concatMap (insertElem x) (perms' xs) where
---      		insertElem x [] = [[x]]
--- 			insertElem x yss@(y:ys) = (x:yss) : map (y:) (insertElem x ys)
+perms' :: [a] -> [[a]]
+perms' [] = [[]]
+perms' [x] = [[x]]
+perms' (x:xs) = concatMap (insertElem x) (perms' xs) where
+			insertElem x [] = [[x]]
+			insertElem x yss@(y:ys) = (x:yss) : map (y:) (insertElem x ys)
 
 
 max3My :: Ord a => [a] -> [a] -> [a] -> [a]

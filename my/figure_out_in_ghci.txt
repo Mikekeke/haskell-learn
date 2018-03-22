@@ -1,0 +1,41 @@
+λ> :t return (+)
+return (+) :: (Monad m, Num a) => m (a -> a -> a)
+λ> :t return (+4)
+return (+4) :: (Monad m, Num a) => m (a -> a)
+λ> :t return (==4)
+return (==4) :: (Eq a, Monad m, Num a) => m (a -> Bool)
+λ> :t (>>=) (return (==4))
+(>>=) (return (==4))
+  :: (Eq a, Monad m, Num a) => ((a -> Bool) -> m b) -> m b
+
+λ> :t (return (==4))
+(return (==4)) :: (Eq a, Monad m, Num a) => m (a -> Bool)
+
+λ> (return (==4)) <*> pure 5
+False
+
+λ> :t (<*>) (return (==4))
+(<*>) (return (==4)) :: (Eq a, Monad f, Num a) => f a -> f Bool
+
+λ> :t (>>=) (return (==4))
+(>>=) (return (==4))
+  :: (Eq a, Monad m, Num a) => ((a -> Bool) -> m b) -> m b
+
+λ> :t (>>=) (return (==4)) (return (==20))
+(>>=) (return (==4)) (return (==20)) :: (Eq a, Num a) => a -> Bool
+
+λ> (>>=) (return (==4)) (return (==20)) 20
+True
+
+λ> (>>=) (return (==4)) (return (==20)) 15
+False
+
+λ> :t (>>=) (+3)
+(>>=) (+3) :: Num a => (a -> a -> b) -> a -> b
+λ> :t (>>=) (+3) (\x y-> y ==20)
+(>>=) (+3) (\x y-> y ==20) :: (Eq a, Num a) => a -> Bool
+λ> ((>>=) (+3) (\x y-> y ==20)) 4
+False
+
+λ Debug.Trace> :t (return (+3)) 5
+(return (+3)) 5 :: Num a => a -> a
