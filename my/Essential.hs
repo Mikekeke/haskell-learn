@@ -24,5 +24,13 @@ res2 = foldr (\x-> map (+x)) [0, 10] [1..5]
 keepInMind :: Integer -> [Integer] -> [Integer]
 keepInMind = \x-> map (+x)
 
-ff :: Int -> String
-ff x = x+x
+-- more stuff to keep in mind: figuring out IO bind
+-- wtf all that for look https://stepik.org/lesson/Монада-IO-8443/step/5?unit=1578
+
+funRem1 x = (x+2, (show x))
+funRem2 s x = (x*10, [show $ head s, (show x) ]) 
+
+funIOExRemake :: (Int -> (Int, a)) ->  (a -> Int -> (Int, b)) -> (Int -> (Int, b))
+funIOExRemake f k = \x -> case f x of (x', a) -> k a x'
+testIOExRem = funIOExRemake funRem1 funRem2
+-- figuring out IO bind - END
