@@ -30,3 +30,6 @@ encode xs = map (\xs' -> (head xs', length xs')) (group xs)
 encode' :: Eq a => [a] -> [(a, Int)]
 encode' = map (liftM2 (,) head length) . group
 -- encode' = (liftM2 (,) head length).group
+
+
+

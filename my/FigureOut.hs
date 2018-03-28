@@ -1,4 +1,6 @@
 module FigureOut where
+import           Control.Monad
+import           Data.Char
 import           Data.List
 import           Debug.Trace
 
@@ -51,3 +53,19 @@ tst = (>>=) (return (+4)) (return (==20)) 20 -- True
 -- (return (+3)) 5 :: Num a => a -> a
 
 -- + см. fogure_out_in_ghci.txt
+
+
+-- some intuition?
+-- Just (+3) <*> pure 5 == 8
+-- Just (+) <*> pure 5 <*> pure 15 == 20
+-- fmap (,) head :: [a] -> b -> (a, b)
+-- fmap (,) head <*> Just :: [a] -> (a, Maybe [a])
+-- (,,) <$> head <*> show <*> Just :: Show a => [a] -> (a, String, Maybe [a])
+
+fnn1 :: a -> (a, Maybe a)
+fnn1 = (,) <$> id <*> Just
+
+fnn2 :: a -> (a, Maybe a)
+fnn2 = liftM2 (,) id Just
+
+-- fnn3 = liftM2 (,) head isUpper  --won't compile, need same monad
