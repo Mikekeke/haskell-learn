@@ -69,3 +69,11 @@ fnn2 :: a -> (a, Maybe a)
 fnn2 = liftM2 (,) id Just
 
 -- fnn3 = liftM2 (,) head isUpper  --won't compile, need same monad
+
+
+encode :: Eq a => [a] -> [(a, Int)]
+encode xs = map (\xs' -> (head xs', length xs')) (group xs)
+
+encode' :: Eq a => [a] -> [(a, Int)]
+encode' = map (liftM2 (,) head length) . group
+-- encode' = (liftM2 (,) head length).group
