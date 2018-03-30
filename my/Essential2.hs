@@ -13,3 +13,9 @@ sequence'' ms = foldr k (return []) ms where
         x <- a
         xs <- z
         return $ x:xs
+
+
+
+data Lol = Lol Int
+bnd c = Just Lol >>= \x -> return $ c x
+bnd' c = Just Lol >>= return .($ c)
