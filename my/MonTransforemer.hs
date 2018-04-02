@@ -13,11 +13,15 @@ instance Monad m => Applicative (MaybeT m) where
         mb <- runMaybeT mt
         pure $ mf <*> mb
 
-
 instance Monad m => Monad (MaybeT m) where
     return = MaybeT . return . Just
-
     -- (>>=) :: MaybeT m a -> (a -> MaybeT m b) -> MaybeT m b
     m >>= k = MaybeT $ runMaybeT m >>= \mb -> case mb of
         Nothing -> return Nothing
         Just v  -> runMaybeT $ k v
+
+liftList :: a ->  MaybeT [] a
+liftList = return
+t1 = (+3) `fmap` (liftList 4)
+t2 = liftList (*10) <*> (liftList 4)
+t3 = liftList 10 >>= \mb -> return $ mb - 400
