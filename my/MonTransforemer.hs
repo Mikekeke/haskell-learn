@@ -22,6 +22,8 @@ instance Monad m => Monad (MaybeT m) where
 
 liftList :: a ->  MaybeT [] a
 liftList = return
+
+--test by getting value with "runMaybeT", wasn't able to do Show instance for it
 t1 = (+3) `fmap` (liftList 4)
 t2 = liftList (*10) <*> (liftList 4)
 t3 = liftList 10 >>= \mb -> return $ mb - 400
