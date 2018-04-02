@@ -58,3 +58,9 @@ f2 x = if x > 10 then Nothing else Just $ x+10
 compos = f1 <=< f2
 testJ14 = return 3 >>= compos
 testNoth = return 11 >>= compos
+
+
+
+
+
+
