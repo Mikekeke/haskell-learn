@@ -1,5 +1,6 @@
 -- localTest :: Reader [Int] (Int,Int,Int)
 import Control.Monad.Reader
+import Data.Map.Strict
 
 fromStr2 :: String -> Int
 fromStr2 s = read s
@@ -11,7 +12,21 @@ calc2 = do
     x2 <- fromStr2'
     return (x1, x2)
 
-localTest :: [Integer] -> (Int, Int, Int)
+
+
+test :: [Integer] -> Int
+test = runReader $ local (4:) (asks length)
+
+localTest' :: Reader [Int] (Int, Int, Int)
+localTest' = do 
+    c1 <- asks length
+    c2 <- asks $ local (++ [4]) length -- works
+    c2 <- local (++ [4]) (asks length) -- works too
+    -- c2 <- asks length
+    c3 <- asks length
+    return (c1,c2,c3)
+
+localTest :: [Int] -> (Int, Int, Int)
 localTest = do 
     c1 <- length
     c2 <- local (1:) length

@@ -26,4 +26,7 @@ liftList = return
 --test by getting value with "runMaybeT", wasn't able to do Show instance for it
 t1 = (+3) `fmap` (liftList 4)
 t2 = liftList (*10) <*> (liftList 4)
-t3 = liftList 10 >>= \mb -> return $ mb - 400
+t3 = liftList 10 >>= \x -> return $ x - 400
+t4help :: Maybe Int -> Maybe Int
+t4help mb = mb >>= \x -> if x > 10 then Just (x*x) else Nothing
+t4 x = liftList x >>= MaybeT .return . t4help
