@@ -20,8 +20,11 @@ instance Monad m => Monad (MaybeT m) where
         Nothing -> return Nothing
         Just v  -> runMaybeT $ k v
 
+liftToMt :: Monad m => a -> MaybeT m a
+liftToMt = return
+
 liftList :: a ->  MaybeT [] a
-liftList = return
+liftList = liftToMt
 
 --test by getting value with "runMaybeT", wasn't able to do Show instance for it
 t1 = (+3) `fmap` (liftList 4)
