@@ -12,8 +12,8 @@ isDefinedAt p x = case runPart p x of
 
 orElse :: Part a -> Part a -> Part a
 orElse pf1 pf2 = Part $ \x -> case runPart pf1 x of
-    v@(Just _) -> v
-    _ -> runPart pf2 x
+    Nothing -> runPart pf2 x
+    just -> just
     
 
 tFun1 :: Int -> Maybe Int
