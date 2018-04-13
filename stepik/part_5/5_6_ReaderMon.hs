@@ -1,6 +1,7 @@
 -- localTest :: Reader [Int] (Int,Int,Int)
 import Control.Monad.Reader
 import Data.Map.Strict
+import Control.Monad
 
 fromStr2 :: String -> Int
 fromStr2 s = read s
@@ -16,6 +17,11 @@ calc2 = do
 
 test :: [Integer] -> Int
 test = runReader $ local (4:) (asks length)
+
+--local :: (r -> r) -> Reader r a -> Reader r a
+--local f m = Reader $ \e -> runReader m (f e)
+--local :: (r -> r') -> Reader r' a -> Reader r a -- changes reader type for passed execution
+--local f m = Reader $ \e -> runReader m (f e)
 
 localTest' :: Reader [Int] (Int, Int, Int)
 localTest' = do 
@@ -45,3 +51,11 @@ doReaderT x = do
     lift $ toMaybeJ (x*2) s1
 
 testRT = runReaderT . doReaderT
+
+-- some more
+-- (>>=) length :: Foldable t => (Int -> t a -> b) -> t a -> b
+-- return (,) :: Monad m => m (a -> b -> (a, b))
+-- length >>= \x -> return (,) :: Foldable t => t a -> a1 -> b -> (a1, b)
+fn :: Foldable t => t a -> (Int, Int)
+-- return x = \_ -> x
+fn = length >>= \x -> return (x,x)
