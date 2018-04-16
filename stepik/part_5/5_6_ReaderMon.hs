@@ -1,7 +1,7 @@
 -- localTest :: Reader [Int] (Int,Int,Int)
-import Control.Monad.Reader
-import Data.Map.Strict
-import Control.Monad
+import           Control.Monad
+import           Control.Monad.Reader
+import           Data.Map.Strict
 
 fromStr2 :: String -> Int
 fromStr2 s = read s
@@ -24,16 +24,15 @@ test = runReader $ local (4:) (asks length)
 --local f m = Reader $ \e -> runReader m (f e)
 
 localTest' :: Reader [Int] (Int, Int, Int)
-localTest' = do 
+localTest' = do
     c1 <- asks length
     c2 <- asks $ local (++ [4]) length -- works
-    c2 <- local (++ [4]) (asks length) -- works too
-    -- c2 <- asks length
+    -- c2 <- local (++ [4]) (asks length) -- works too
     c3 <- asks length
     return (c1,c2,c3)
 
 localTest :: [Int] -> (Int, Int, Int)
-localTest = do 
+localTest = do
     c1 <- length
     c2 <- local (1:) length
     c3 <- length
@@ -45,7 +44,7 @@ toMaybeJ x e = Just $ e++" "++show (x+1)
 toMaybeN :: Int -> String -> Maybe String
 toMaybeN _ _ = Nothing
 doReaderT :: Int -> ReaderT String Maybe String
-doReaderT x = do 
+doReaderT x = do
     e <- ask
     s1 <- lift $ toMaybeJ x e
     lift $ toMaybeJ (x*2) s1
