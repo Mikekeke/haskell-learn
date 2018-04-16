@@ -55,6 +55,8 @@ execLoggersList a = foldl (>>=) $ return a
 
 f1 x = Just $ x+1
 f2 x = if x > 10 then Nothing else Just $ x+10
+-- first f2, then f1, like (.)
+-- there is also >=>
 compos = f1 <=< f2
 testJ14 = return 3 >>= compos
 testNoth = return 11 >>= compos

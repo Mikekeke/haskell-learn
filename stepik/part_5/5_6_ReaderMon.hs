@@ -2,6 +2,7 @@
 import           Control.Monad
 import           Control.Monad.Reader
 import           Data.Map.Strict
+import           Debug.Trace
 
 fromStr2 :: String -> Int
 fromStr2 s = read s
@@ -33,6 +34,7 @@ localTest' = do
 
 localTest :: [Int] -> (Int, Int, Int)
 localTest = do
+    -- c :: Int `coz` length monad too ((->)[Int]) (?)
     c1 <- length
     c2 <- local (1:) length
     c3 <- length
@@ -58,3 +60,14 @@ testRT = runReaderT . doReaderT
 fn :: Foldable t => t a -> (Int, Int)
 -- return x = \_ -> x
 fn = length >>= \x -> return (x,x)
+
+-- hmm
+m1 x = if x > 3 then Just x else Nothing
+m2 x = if x < 13 then Just x else Nothing
+
+tst :: Int -> Maybe Int
+tst = do
+    -- x1 :: Maybe Int
+    x1 <- m1
+    x2 <- m2
+    return $  (trace (show x1)) (trace (show x2)) x2

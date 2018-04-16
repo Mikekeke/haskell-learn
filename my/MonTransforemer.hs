@@ -27,6 +27,8 @@ liftList :: a ->  MaybeT [] a
 liftList = liftToMt
 
 --test by getting value with "runMaybeT", wasn't able to do Show instance for it
+type MaybeTList a = MaybeT [] a
+t1 :: MaybeTList Int
 t1 = (+3) `fmap` (liftList 4)
 t2 = liftList (*10) <*> (liftList 4)
 t3 = liftList 10 >>= \x -> return $ x - 400
