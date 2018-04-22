@@ -44,3 +44,20 @@ tst2 = liftA2 (+) (Just 5) (Just 6)
 tst3 = (+) <$> Just 5 <*> Just 6
 res = maybe False (all (==11)) . sequence $  [tst1, tst2, tst3]
 resMaybe = pure (all (==11)) <*> sequence [tst1, tst2, tst3]
+
+
+tst21 = Just (+2) <*> pure 4
+-- same
+tst22 = pure ($ 4) <*> Just (+2)
+-- explanation:
+-- (<*>) :: Applicative f => f (a -> b) -> f a -> f b
+-- ($ 4) :: Num a => (a -> b) -> b
+-- fn = ($ 4)
+-- fn (+10) will be 14
+
+
+tst4 = pure (.) <*> Just (+100) <*> Just (^2) <*> Just 4 -- == Just 116
+tst4' = (.) (+100) (^2) 4   -- == 116
+tst4'' = (+100) . (^2) $ 4  -- == 116
+
+
