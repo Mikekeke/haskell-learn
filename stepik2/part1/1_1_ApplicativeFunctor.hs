@@ -1,3 +1,5 @@
+import           Control.Applicative
+
 newtype Arr2 e1 e2 a = Arr2 {getArr2 :: e1 -> e2 -> a}
 newtype Arr3 e1 e2 e3 a = Arr3 {getArr3 :: e1 -> e2 -> e3 -> a}
 
@@ -35,3 +37,10 @@ test2 = getArr3 (tail <$> tail <$> Arr3 zipWith) (+) [1,2,3,4] [10,20,30,40,50]
     λ: :t fmap . fmap $ take
     fmap . fmap $ take:: (Functor f2, Functor f1) => f1 (f2 Int) -> f1 (f2 ([a] -> [a]))
 -}
+
+
+tst1 = Just (+) <*> Just 5 <*> Just 6
+tst2 = liftA2 (+) (Just 5) (Just 6)
+tst3 = (+) <$> Just 5 <*> Just 6
+res = maybe False (all (==11)) . sequence $  [tst1, tst2, tst3]
+resMaybe = pure (all (==11)) <*> sequence [tst1, tst2, tst3]
