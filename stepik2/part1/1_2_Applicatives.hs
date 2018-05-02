@@ -8,6 +8,7 @@ x2s = [4,5,6]
 x3s = [7,8,9]
 x4s = [10,11,12]
 
+<<<<<<< HEAD
 
 
 newtype Arr2 e1 e2 a = Arr2 { getArr2 :: e1 -> e2 -> a }
@@ -53,3 +54,14 @@ instance Applicative (Arr3 e1 e2 e3) where
 -- Just 4 *> Just 5 == Just 5
 -- Nothing *> Just 5 == Nothing
 -- result wil have structure of both contaners with elements from second one
+=======
+-- step 7
+divideList :: Fractional a => [a] -> a
+divideList []     = 1
+divideList (x:xs) = (/) x (divideList xs)
+
+divideList' :: (Show a, Fractional a) => [a] -> (String,a)
+divideList' []     = ("1.0",1)
+divideList' (x:xs) = (/) <$> (toLogEntry x, x) <*> divideList' xs where
+    toLogEntry x' = "<-" ++ show x' ++ "/"
+>>>>>>> cceb6f0189eb80525eadc7f0f81b9d7e1ac273a9
