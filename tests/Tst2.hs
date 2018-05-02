@@ -36,7 +36,6 @@ runTest1 = runState . test $ testTerrain
 
 behavior' :: Terrain -> State Ant Ant
 behavior' Flat = get
-
 behavior' Rock = modify tireAnt >> get
 
 -- test2 :: [Terrain] -> StateT Ant Data.Functor.Identity.Identity [Ant] -- whatever...
