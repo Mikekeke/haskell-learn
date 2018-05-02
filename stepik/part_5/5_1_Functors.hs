@@ -36,3 +36,8 @@ module Functors where
     -- instance Functor ((,) s) where
     --     fmap f (x,y) = (x, f y)
     -- it wiil work only with second value in tuple
+
+    -- keep in mind
+    -- import Data.Functor
+    -- ($>) :: Functor f => f a -> b -> f b
+    -- [1,2,3] $> 'c' == "ccc" -- structure of container didn't change, it's still list of 3 elements

@@ -35,6 +35,9 @@ plus :: Int -> Int -> Int
 plus a b = execState (sequence $ replicate a tick) b
 t1 = runState (sequence $ replicate 5 tick) 6 -- == ([6,7,8,9,10],11)
 t2 = runState (sequence_ $ replicate 5 tick) 6 -- == ((),11)
+-- evalState :: State s a -> s -> a
+-- execState :: State s a -> s -> s
+-- runState :: State s a -> s -> (a, s)
 t3 = evalState (sequence $ replicate 5 tick) 6 -- == [6,7,8,9,10]
 
 plus' :: Int -> Int -> Int
@@ -54,7 +57,7 @@ execStateN :: Int -> State s a -> s -> s
 execStateN n m = execState (replicateM_ n m)
 
 fib :: Int -> Integer
-fib n = fst $ execStateN n fibStep (0, 1)
+fib n = fst $ execStateN n fibStep' (0, 1)
 
 
 -- Number tree
