@@ -16,8 +16,9 @@ sequence'' ms = foldr k (return []) ms where
 
 
 
-data Lol = Lol Int
-bnd c = Just Lol >>= \x -> return $ c x
+data Lol = Lol Int deriving Show
+-- :t Just Lol :: Maybe (Int -> Lol)
+bnd c = Just Lol >>= \x -> return $ x c
 bnd' c = Just Lol >>= return .($ c)
 
 
