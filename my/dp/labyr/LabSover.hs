@@ -18,7 +18,7 @@ validRawLab lab = let lens = fmap length lab
                   in size (fromList lens) == 1
 
 type Labyrinth = [[Bool]]
-data Position = Position {xPos::Int, yPos::Int} deriving (Eq, Ord)
+data Position = Position {xPos :: !Int, yPos :: !Int} deriving (Eq, Ord)
 
 instance Show Position where
     show p = show $ (,) <$> xPos <*> yPos $ p
