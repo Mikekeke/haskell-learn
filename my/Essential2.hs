@@ -25,6 +25,9 @@ bnd' c = Just Lol >>= return .($ c)
 -- *****************
 fromStr :: Monad m => String -> m Int
 fromStr s = if length s == 2 then return $ read s else fail "myErr"
+-- fromStr "12" :: Maybe Int ~> Just 12
+-- fromStr "1" :: Maybe Int ~> Nothing
+-- fromStr "1" :: Either String Int ~> *** Exception: myErr
 
 process1 :: Int -> [Int]
 process1 = return . (+2)
