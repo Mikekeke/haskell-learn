@@ -16,7 +16,7 @@ validRawLab :: [String] -> Bool
 validRawLab [] = error "Empty lab"
 validRawLab lab = let lens = fmap length lab
                   in size (fromList lens) == 1
-                  
+
 data Move = Stand | Up | Down | Lft | Rght deriving Show
 instance Eq Move where
     _ == _ = True
@@ -49,7 +49,7 @@ isExit l p = let x' = xPos p
 findOuts :: Labyrinth -> Position -> [Position] -> [[Position]]
 findOuts lab pos seen | not (isLegalPos lab pos) = error "Illegal start position"
                       | isExit lab pos = [[pos]]
-                      | otherwise = do
+                      | otherwise =
                         if elem pos seen then []
                         else do
                             newPos <- Prelude.filter (isLegalPos lab) (nextPoss pos)
