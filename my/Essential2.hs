@@ -1,3 +1,4 @@
+import           Control.Monad
 test1 = [Just 1, Just 2, Just 3]
 test2 = [Just 1, Nothing, Just 3]
 
@@ -14,7 +15,13 @@ sequence'' ms = foldr k (return []) ms where
         xs <- z
         return $ x:xs
 
-
+sequence''' :: Monad m => [m a] -> m [a]
+sequence''' ms = foldr (liftM2 (:)) (pure [])
+-- liftM2 equivalent to k a z = do
+                        -- x <- a
+                        -- xs <- z
+                        -- return $ (:) x xs
+-- which desugars to m1 >>= (\x1 -> m2 >>= (\x2 -> return (f x1 x2)))
 
 data Lol = Lol Int deriving Show
 -- :t Just Lol :: Maybe (Int -> Lol)

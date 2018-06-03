@@ -1,5 +1,5 @@
-import Data.Set
-import Debug.Trace
+import           Data.Set
+import           Debug.Trace
 
 labFile = "./my/dp/labyr/lab1"
 parseTerrain c | c == '.' = True
@@ -25,8 +25,8 @@ type Labyrinth = [[Bool]]
 data Position = Position {xPos :: !Int, yPos :: !Int, prevMove :: Move} deriving Eq
 
 instance Show Position where
-    -- show p = show $ (,) <$> xPos <*> yPos $ p
-    show p = show $ prevMove p
+    show p = show $ (,) <$> xPos <*> yPos $ p
+    -- show p = show $ prevMove p
 
 isLegalPos :: Labyrinth -> Position -> Bool
 isLegalPos lab pos | y' >= length lab = False
@@ -49,12 +49,16 @@ isExit l p = let x' = xPos p
 findOuts :: Labyrinth -> Position -> [Position] -> [[Position]]
 findOuts lab pos seen | not (isLegalPos lab pos) = error "Illegal start position"
                       | isExit lab pos = [[pos]]
-                      | otherwise =
-                        if elem pos seen then []
-                        else do
-                            newPos <- Prelude.filter (isLegalPos lab) (nextPoss pos)
-                            nextPoss <- findOuts lab newPos (pos : seen)
-                            [pos : nextPoss]
+                      | otherwise = do
+                        {- https://stepik.org/lesson/Список-и-Maybe-как-монады-8439/step/7?unit=1574
+                        list of one element to pass futher;
+                        if more than one element, rest will be replicated by number of elements -}
+                        if elem pos seen then [] else "z"
+                        newPos <- nextPoss pos
+                        -- coz in case of "False" pattern match will fail, and "fail" for list monad is []
+                        True <- return $ isLegalPos lab newPos
+                        nextPoss <- findOuts lab newPos (pos : seen)
+                        [pos : nextPoss]
 
 solveLab lab startPos = findOuts lab startPos []
 
@@ -71,7 +75,7 @@ main :: IO ()
 main = do
     lines' <- lines <$> readFile labFile
     case validRawLab lines' of
-        True -> let 
+        True -> let
                     lab = parseLab lines'
                     result = solveLab lab currentPos
                 in do
