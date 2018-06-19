@@ -1,19 +1,20 @@
+import           Control.Applicative
+-- >>> filtering (>) (4 :. 5 :. 6 :. 7 :. 8 :. 9 :. 10 :. 11 :. 12 :. Nil) 8
+-- [9,10,11,12]
 
-data Figure = One | Two deriving Show
-data Square = Empty | Occ Figure deriving Show
+filtering ::
+  Applicative f =>
+  (a -> f Bool)
+  -> [a]
+  -> f [a]
 
-figs = [
-     ('a', One)
-    ,('b', Two)
-    ]
+filtering f l = \x -> filter <$> f l
+-- filtering _ []        = pure []
+-- filtering fa (x : xs) = liftA2 (:) (res *> fx) (filtering fa xs) where
+--     fx = pure x
+--     res = (fa x)
+--     -- comp = res == (res *> (pure True))
 
-readFig :: Char -> Either String Square
+tp = (\a -> if a > 3 then Nothing else Just (a > 1))
 
-readFig '.' = return Empty
-readFig c = Occ <$> maybeToEither errMsg (lookup c figs) where
-    errMsg = "Invalid char: " ++ show c
-    maybeToEither _ (Just v)  = return v
-    maybeToEither err Nothing = Left err
-
-goodBoard = "ab..a"
-badBoard = ".a34"
+foldFiltr p = foldl (\acc x -> if p x then x : acc else acc) []
