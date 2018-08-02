@@ -1,6 +1,7 @@
 import           Control.Monad.State
 import           Data.List
 import           Data.Monoid
+import           Debug.Trace
 
 find1 p []     = Nothing
 find1 p (x:xs) = if p x then Just x else find1 p xs
@@ -19,26 +20,28 @@ f2 =  get >>= \s -> return (4 + (length s))
 
 
 data Fromwhere = Head | Tail | End deriving Show
-type ListSt = (Fromwhere, [Char])
+type ListSt a = (Fromwhere, [a])
 
 -- ver .1
-delFromHT :: ListSt -> ([Char], ListSt)
+delFromHT :: ListSt a -> ([a], ListSt a)
 delFromHT (_, [])    = ([], (End, []))
 delFromHT (Head, xs) = ([head xs], (Tail, drop 1 xs))
 delFromHT (Tail, xs) = ([last xs], (Head, init xs))
 
-newState1 :: State ListSt [Char]
+newState1 :: State (ListSt a) [a]
 newState1 = state delFromHT
 
-calcShit :: [Char] -> State ListSt [Char]
+calcShit :: Show a => [a] -> State (ListSt a) [a]
 calcShit l = do
    l' <- newState1
    case null l' of
-    True -> return l
-    _    -> calcShit (l ++ l')
+    True -> (return l)
+    _    -> calcShit (l' ++ l)
+-- λ: runState (calcShit "z") (Head, "123456")
+-- ("435261z",(End,""))
 
 -- ver. 2
-delFromHT' :: ListSt -> ListSt
+delFromHT' :: ListSt a -> ListSt a
 delFromHT' (_, [])    =(End, [])
 delFromHT' (Head, xs) =(Tail, drop 1 xs)
 delFromHT' (Tail, xs) = (Head, init xs)
@@ -47,22 +50,18 @@ resFromHT (_, [])    = []
 resFromHT (Head, xs) = [head xs]
 resFromHT (Tail, xs) = [last xs]
 
-newState2 :: State ListSt [Char]
+newState2 :: State (ListSt a) [a]
 newState2 = do
     s <- get
     modify delFromHT'
     return $ resFromHT s
 
-calcShit2 :: [Char] -> State ListSt [Char]
+calcShit2 ::  Show a => [a] -> State (ListSt a) [a]
 calcShit2 l = do
    l' <- newState2
    case null l' of
     True -> return l
     _    -> calcShit (l ++ l')
-
-f3 :: State ListSt [Char]
-f3 = undefined
-main = putStr "Done"
 
 fnFind _ []     = Nothing
 fnFind p (x:xs) = case p x of True -> Just x; _ -> fnFind p xs

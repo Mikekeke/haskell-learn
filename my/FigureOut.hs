@@ -17,16 +17,16 @@ perms' (x:xs) = concatMap (insertElem x) (perms' xs) where
     insertElem x []         = [[x]]
     insertElem x yss@(y:ys) = (x:yss) : map (y:) (insertElem x ys)
 
-groupElems3 :: Eq a => [a] -> [[a]]
-groupElems3 [] = []
-groupElems3 [x] = [[x]]
-groupElems3 (x:xs)
- | x == head xs =
-    let
-        (r:rs) = groupElems3 xs
-    in
-        (x : r) : rs
- | otherwise = [x] : groupElems3 xs
+-- understood
+group' :: Eq a => [a] -> [[a]]
+group' [] = []
+group' [x] = [[x]]
+group' (x:xs) | x == head xs = let (x':xs') = group' xs in (x : x') : xs'
+              | otherwise = [x] : group' xs
+--   1:2:[]
+--   [1,2]
+--   λ: 1:2:[3]
+--   [1,2,3]
 
 
 --without '~' not gonna work on infinite lists
@@ -70,10 +70,9 @@ fnn2 = liftM2 (,) id Just
 
 -- fnn3 = liftM2 (,) head isUpper  --won't compile, need same monad
 
-
+-- understood
 encode :: Eq a => [a] -> [(a, Int)]
 encode xs = map (\xs' -> (head xs', length xs')) (group xs)
-
+-- understood
 encode' :: Eq a => [a] -> [(a, Int)]
 encode' = map (liftM2 (,) head length) . group
--- encode' = (liftM2 (,) head length).group
