@@ -87,3 +87,9 @@ encode' = map (liftM2 (,) head length) . group
 
 -- anyChr :: Prs Char
 -- anyChr = Prs uncons
+
+-- do-notation variation
+-- instance Functor Prs where
+--     fmap f p = Prs fun where
+--         fun x = do (a, as) <- (runPrs p x)
+--                    Just (f a, as)
