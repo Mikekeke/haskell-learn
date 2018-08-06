@@ -76,3 +76,14 @@ encode xs = map (\xs' -> (head xs', length xs')) (group xs)
 -- understood
 encode' :: Eq a => [a] -> [(a, Int)]
 encode' = map (liftM2 (,) head length) . group
+
+
+-- some advanced solution from solutions of stepik #2 1_4
+-- import Data.List (uncons)
+-- import Control.Arrow (first)
+
+-- instance Functor Prs where
+--   fmap f (Prs p) = Prs $ (fmap . fmap . first) f p
+
+-- anyChr :: Prs Char
+-- anyChr = Prs uncons
