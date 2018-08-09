@@ -1,4 +1,5 @@
 import           Data.Char
+import Control.Applicative
 
 -- lection
 newtype Parser a = Parser {apply :: String -> [(a, String)] }
@@ -45,7 +46,12 @@ instance Applicative Parser where
 -- apply ((,) <$> anyChar <*> anyChar) "ABCD" ~> [(('A', 'B'), "CD")]
 --            ^^^ здесь комбинация 3х парсеров: (pure (,) <*> anyChar <*> anyChar), pure (,) ничего не делает с воодомштыеф
 
-
+instance Alternative Parser where
+    empty = Parser $ \_ -> []
+    lp <|> rp = Parser $ \s -> 
+        case apply lp s of
+            [] -> apply rp s
+            rs -> rs 
 
 
 
