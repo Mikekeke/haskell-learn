@@ -16,7 +16,7 @@ sequence'' ms = foldr k (return []) ms where
         return $ x:xs
 
 sequence''' :: Monad m => [m a] -> m [a]
-sequence''' ms = foldr (liftM2 (:)) (pure [])
+sequence''' = foldr (liftM2 (:)) (pure [])
 -- liftM2 equivalent to k a z = do
                         -- x <- a
                         -- xs <- z
