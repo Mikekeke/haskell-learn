@@ -1,5 +1,5 @@
+import           Control.Applicative
 import           Data.Char
-import Control.Applicative
 
 -- lection
 newtype Parser a = Parser {apply :: String -> [(a, String)] }
@@ -48,10 +48,10 @@ instance Applicative Parser where
 
 instance Alternative Parser where
     empty = Parser $ \_ -> []
-    lp <|> rp = Parser $ \s -> 
+    lp <|> rp = Parser $ \s ->
         case apply lp s of
             [] -> apply rp s
-            rs -> rs 
+            rs -> rs
 
 
 
@@ -82,6 +82,20 @@ instance Applicative Prs  where
         (a, s2) <- runPrs pa s1
         return (f a, s2)
 
+-- my "from scratch"
+instance Alternative Prs where
+    empty = Prs $ \_ -> Nothing
+--  empty = Prs $ const Nothing
+
+    lp <|> rp = Prs fun where
+        fun s = case runPrs lp s of
+            Nothing -> runPrs rp s
+            result  -> result
+-- more from solutions
+--  l <|> r = Prs f where f s = runPrs l s <|> runPrs r s
+--    coz these Maybes have Al. ^^^^^^^^^^     ^^^^^^^^^^
+-- !!! используется Applicative'ность стрелки и Alternative'ность Maybe
+-- lp <|> rp = Prs $ (<|>) <$> (runPrs pa) <*> (runPrs pb)
 
 
 newtype PrsE a = PrsE { runPrsE :: String -> Either String (a, String) }
