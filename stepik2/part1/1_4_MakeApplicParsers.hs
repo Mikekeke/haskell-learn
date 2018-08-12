@@ -22,6 +22,9 @@ satisfy p = Parser fn where
 lower = satisfy isLower
 -- apply lower "Abc" ~> []
 
+lowers = (:) <$> lower <*> lowers <|> pure ""
+-- lowers = pure (:) <*> lower <*> lowers <|> pure ""
+
 char :: Char -> Parser Char
 char c = satisfy (==c)
 
@@ -30,6 +33,9 @@ digit = digitToInt <$> satisfy isDigit
 
 multiplicatoin ::  Parser Int
 multiplicatoin = (*) <$> digit <* char '*' <*> digit
+
+many' :: Parser a -> Parser [a]
+many' p = (:) <$> p <*> many' p <|> pure []
 
 instance Functor Parser where
     fmap f p = Parser $ \s -> map (\(a,b) -> (f a, b)) (apply p s)
@@ -96,6 +102,40 @@ instance Alternative Prs where
 --    coz these Maybes have Al. ^^^^^^^^^^     ^^^^^^^^^^
 -- !!! используется Applicative'ность стрелки и Alternative'ность Maybe
 -- lp <|> rp = Prs $ (<|>) <$> (runPrs pa) <*> (runPrs pb)
+
+satisfy' :: (Char -> Bool) -> Prs Char
+satisfy' p = Prs fn where
+    fn "" = Nothing
+    fn (c:cs) | p c = Just (c, cs)
+              | otherwise = Nothing
+char' :: Char -> Prs Char
+char' c = satisfy' (==c)
+digit' :: Prs Int
+digit' = digitToInt <$> satisfy' isDigit
+
+many1' :: Prs a -> Prs [a]
+many1' p =  (:) <$> p <*> (many1' p <|> pure [])
+-- from solutions
+many'' :: Prs a -> Prs [a]
+many'' p = (:) <$> p <*> many'' p <|> pure []
+many1'' :: Prs a -> Prs [a]
+many1'' p =  (:) <$> p <*> many'' p
+--many1'' = liftM2 (<*>) ((:) <$>) many''
+
+
+nat :: Prs Int
+nat = read <$> (many1' $ satisfy' isDigit)
+-- from soolutions better decomposition (but digit has type Prs Char)
+-- digit :: Prs Char
+-- digit = satisfy isDigit
+-- digits :: Prs String
+-- digits = many1 digit
+
+-- nat :: Prs Int
+-- nat = fmap read digits
+
+mult :: Prs Int
+mult = (*) <$> nat <* char' '*' <*> nat
 
 
 newtype PrsE a = PrsE { runPrsE :: String -> Either String (a, String) }
