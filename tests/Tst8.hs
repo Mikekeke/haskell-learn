@@ -1,4 +1,4 @@
-import Data.Monoid
+import           Data.Monoid
 
 group' :: Eq a => [a] -> [[a]]
 group' [] = []
@@ -12,7 +12,7 @@ group' (x:xs) | x == head xs = let (x':xs') = group' xs in (x : x') : xs'
 
 data Validate e a = Invalid {errors :: e} | Valid a deriving Show
 instance Functor (Validate e) where
-    fmap f (Valid v) = Valid $ f v
+    fmap f (Valid v)    = Valid $ f v
     fmap _ (Invalid es) = Invalid es
 
 instance Monoid e => Applicative (Validate e) where
@@ -30,18 +30,12 @@ parseObj x s = Obj <$> prsInt x <*> prsStr s
 tstGood = parseObj 12 "sobaka"
 tstBad = parseObj 3 "kek"
 
-sliding :: Int -> [a] -> [[a]]
-
-sliding 0 _ = []
-sliding _ [] = []
-sliding n ls | length ls <= n = [ls]
+sliding :: (a -> a -> Bool) -> Int -> [a] -> [[a]]
+sliding p 0 _ = []
+sliding p _ [] = []
+sliding p n ls | length ls <= n = [ls]
              | otherwise = go n ls where
-                go n' (x':xs') | n' == 0 = [] :  sliding n (tail ls)
-                               | otherwise = let (y:ys) = go (n' - 1) xs' in (x' : y) : ys
-
-sliding' :: Int -> [a] -> [[a]]
-sliding' n ls | n == 0 || null ls = []
-              | length ls > n =  (take n ls)  : sliding' n (tail ls)
-              | otherwise = [ls]
-
-slTest x = (==) <$> sliding x <*> sliding' x
+                go _ [] = []
+                go n' (x:xs) | n' == 0 = [] :  sliding p n (tail ls)
+                             | otherwise = let (y:ys) = go (n' - 1) xs in
+                                if p x (head y) then (x : y) : ys else []
