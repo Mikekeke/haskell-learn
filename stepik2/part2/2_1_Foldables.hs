@@ -42,15 +42,15 @@ instance Foldable Preorder where
     foldr f ini (PreO Nil)     = ini
     foldr f ini (PreO (Branch l x r)) = f x (foldr f (foldr f ini (PreO r)) (PreO l))
     -- foldr (:) [] $ PreO tree ~> [3,1,2,4]
-    -- foldr f ini (LevelO (Branch l x r)) =
-    --     f x . (\i -> (foldr f i (LevelO l))) . (\i -> (foldr f i (LevelO r))) $ ini
+    -- foldr f ini (PreO (Branch l x r)) =
+    --     f x . (\i -> (foldr f i (PreO l))) . (\i -> (foldr f i (PreO r))) $ ini
 
 instance Foldable Postorder where
     foldr f ini (PostO Nil)     = ini
     foldr f ini (PostO (Branch l x r)) =  foldr f (foldr f (f x ini) (PostO r)) (PostO l)
-    -- foldr (:) [] $ PreO tree ~> [2,1,4,3]
-    -- foldr f ini (LevelO (Branch l x r)) =
-    --     (\i -> (foldr f i (LevelO l))) . (\i -> (foldr f i (LevelO r))) . f x $ ini
+    -- foldr (:) [] $ PostO tree ~> [2,1,4,3]
+    -- foldr f ini (PostO (Branch l x r)) =
+    --     (\i -> (foldr f i (PostO l))) . (\i -> (foldr f i (PostO r))) . f x $ ini
 
 toLs :: Levelorder a -> [a]
 toLs (LevelO Nil)            = []
@@ -63,6 +63,13 @@ toLs (LevelO (Branch l x r)) =  [x,l',r'] ++ ls ++ rs where
 
 instance Foldable Levelorder where
     foldr f ini (LevelO Nil)             = ini
-    foldr f ini  (LevelO (Branch l x r)) = f x $ foldr f ini ([LevelO l, LevelO r])
+    foldr f ini  (LevelO t) = foldr f ini (gg t) where
+        gg :: Tree a -> [a]
+        gg (Branch Nil v Nil) =  [v]
+        gg (Branch Nil v r1) = v : (head.gg $ r1) : (tail.gg $ r1) 
+        gg (Branch l1 v Nil) = v : (head.gg $ l1) : (tail.gg $ l1) 
+        gg (Branch l1 v r1) = v : (head.gg $ l1) : (head.gg $ r1) : ((tail.gg $ l1) ++ (tail.gg $ r1))
     -- [3,1,4,2]
 
+
+tree2 = (Branch (Branch (Branch Nil 'A' Nil) 'B' (Branch (Branch Nil 'C' Nil) 'D' (Branch Nil 'E' Nil))) 'F' (Branch Nil 'G' (Branch (Branch Nil 'H' Nil) 'I' Nil)))
