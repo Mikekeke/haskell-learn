@@ -35,9 +35,9 @@ isMatchTop c st = let res = (==) <$> top st <*> pure (getOpeningFor c)
 
 check :: Char -> CheckState -> (Result, CheckState)
 check b (step, stack) | isClosing b &&  matchingTop = (succRes, (succ step, snd (pop stack)))
-                                  | isClosing b && not matchingTop = (Left step, (step, stack))
-                                  | otherwise = (succRes, (succ step, push b stack))
-                                  where matchingTop = isMatchTop b stack
+                      | isClosing b && not matchingTop = (Left step, (step, stack))
+                      | otherwise = (succRes, (succ step, push b stack))
+                      where matchingTop = isMatchTop b stack
 
 checkBr :: String -> State CheckState Result                                  
 checkBr [] = return succRes
