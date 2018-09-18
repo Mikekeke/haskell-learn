@@ -4,6 +4,7 @@ import Data.List (elemIndex, sortBy)
 import Data.Maybe (fromMaybe)
 import Data.Char (isDigit)
 import Data.Ord (comparing)
+import qualified Data.Map.Strict as Map
 
 fact x = product [1..x]
 
@@ -45,3 +46,23 @@ findEvenIndex1 = fromMaybe (-1) . elemIndex True .
 pullNum s = head . dropWhile (not . isDigit) $ s
 yourOrderPlease :: String -> String
 yourOrderPlease = unwords . sortBy (comparing pullNum) . words
+
+-- Memoized Fibonacci --
+-- not working yet
+type Fibs = Map.Map Integer Integer
+
+fibonacci n = go Map.empty n where
+    go ::  Fibs -> Integer -> Integer
+    go cc 0 = (0, cc)
+    go cc 1 = (1, cc)
+    go cache n' x = a + b where
+        found = Map.lookup (n'- x) (traceShowId newCache)
+        newCache = Map.insert (n'-1) a cache
+        a = go newCache (n'-1)
+        
+        
+
+
+
+fibStream :: [Integer]
+fibStream = 0 : 1 : zipWith (+) (fibStream) (tail fibStream)
