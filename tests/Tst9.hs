@@ -44,4 +44,7 @@ solve s l = reverse . map show $ ranking ranks levels
           | s < l = ranking' rs rnks (l:lz)
           | otherwise = ranking' ((r+1):rs) ((r,s):rnks) lz
         ranks = reverse . zip [1..] . map head $ group scores
+
+
+foldr (\c (f,s,fl) -> if fl then (f,c:s,False) else (c:f,s,True)) ([],[],False)
     
