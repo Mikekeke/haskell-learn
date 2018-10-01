@@ -1,13 +1,14 @@
 import Data.List
+import Data.List.Split
 
-test :: [[Int]] -> String
-test [x] = "YES"
-test [x, [1]] = "YES"
-test [[x],(y:ys)]
-  | x - 1 == y = "YES"
-  | otherwise = "NO"
-test x = "NO"
+s = mconcat $ repeat "AB"
+rotate1 s = let
+    (l,r,_) = foldr (\c (l1,r2,p) -> if p then (c:l1,r2, not p) else (l1,c:r2, not p)) ([],[],True) s 
+    in r ++ l
 
-main = do
-  t <- getLine
-  putStrLn . test . reverse . sort . group . map length $ group . sort $ t
+rotate2 s = let
+    (l,r) = foldr f ([],[]) $ chunksOf 2 s
+    f tpl (l1,r2) = case tpl of
+        (x:y:_) ->  (x:l1, y:r2)
+        (x:[]) ->  (x:l1, r2)
+    in r ++ l
