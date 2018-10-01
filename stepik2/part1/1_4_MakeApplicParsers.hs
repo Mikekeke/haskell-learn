@@ -52,6 +52,7 @@ instance Applicative Parser where
 -- apply ((,) <$> anyChar <*> anyChar) "ABCD" ~> [(('A', 'B'), "CD")]
 --            ^^^ здесь комбинация 3х парсеров: (pure (,) <*> anyChar <*> anyChar), pure (,) ничего не делает с воодомштыеф
 
+
 instance Alternative Parser where
     empty = Parser $ \_ -> []
     lp <|> rp = Parser $ \s ->
@@ -59,6 +60,13 @@ instance Alternative Parser where
             [] -> apply rp s
             rs -> rs
 
+-- якобы разбирает неоднозначно
+crazyChar :: Parser Char
+crazyChar  = Parser f where
+    f ""     = []
+    f (c:cs) = [(pred c,cs), (c,cs),(succ c,cs)] 
+tst1 =  apply ((,) <$> anyChar <*> crazyChar) "059"
+-- ~> [(('0','4'),"9"),(('0','5'),"9"),(('0','6'),"9")]
 
 
 -- *** tasks ***
