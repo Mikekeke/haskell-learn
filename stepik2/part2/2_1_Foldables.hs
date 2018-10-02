@@ -24,12 +24,17 @@ instance Foldable Triple where
 --   foldr f ini Nil = ini
 --   foldr f ini (Branch l x r) = (\i -> (foldr f i l)) . f x . (\i -> (foldr f i r)) $ ini
 
-data Tree a = Nil | Branch (Tree a) a (Tree a)   deriving (Eq, Show)
+data Tree a = Nil | Branch (Tree a) a (Tree a)   deriving (Eq)
 newtype Preorder a   = PreO   (Tree a)    deriving (Eq, Show)
 newtype Postorder a  = PostO  (Tree a)    deriving (Eq, Show)
 newtype Levelorder a = LevelO (Tree a)    deriving (Eq, Show)
 
+instance Show a => Show (Tree a) where 
+    show Nil = "(X)"
+    show (Branch l a r) = (show l) ++ "-" ++ (show a) ++ "-" ++ (show r)
+
 tree = Branch (Branch Nil 1 (Branch Nil 2 Nil)) 3 (Branch Nil 4 Nil)
+treeLection = Branch (Branch (Branch Nil 1 Nil) 2 (Branch Nil 3 Nil)) 4 (Branch Nil 5 Nil)
 
 -- inorder
 instance Foldable Tree where
@@ -40,36 +45,40 @@ instance Foldable Tree where
 
 instance Foldable Preorder where
     foldr f ini (PreO Nil)     = ini
-    foldr f ini (PreO (Branch l x r)) = f x (foldr f (foldr f ini (PreO r)) (PreO l))
+    foldr f ini (PreO (Branch l x r)) = f x (foldr f (foldr f ini r') l') where
+        l' = PreO l
+        r' = PreO r
     -- foldr (:) [] $ PreO tree ~> [3,1,2,4]
     -- foldr f ini (PreO (Branch l x r)) =
     --     f x . (\i -> (foldr f i (PreO l))) . (\i -> (foldr f i (PreO r))) $ ini
 
 instance Foldable Postorder where
     foldr f ini (PostO Nil)     = ini
-    foldr f ini (PostO (Branch l x r)) =  foldr f (foldr f (f x ini) (PostO r)) (PostO l)
+    foldr f ini (PostO (Branch l x r)) =  foldr f (foldr f (f x ini) r') l' where
+        l' = PostO l
+        r' = PreO r
     -- foldr (:) [] $ PostO tree ~> [2,1,4,3]
     -- foldr f ini (PostO (Branch l x r)) =
     --     (\i -> (foldr f i (PostO l))) . (\i -> (foldr f i (PostO r))) . f x $ ini
 
-toLs :: Levelorder a -> [a]
-toLs (LevelO Nil)            = []
-toLs (LevelO (Branch Nil x Nil)) = [x]
-toLs (LevelO (Branch Nil x r)) = [x] ++ (toLs $ LevelO r)
-toLs (LevelO (Branch l x Nil)) = [x] ++ (toLs $ LevelO l)
-toLs (LevelO (Branch l x r)) =  [x,l',r'] ++ ls ++ rs where
-    (l':ls) = toLs $ LevelO l
-    (r':rs) = toLs $ LevelO r
+
+getChildren :: Tree a -> [Tree a]
+getChildren (Branch Nil _ Nil) = []
+getChildren (Branch Nil _ r) = [r]
+getChildren (Branch l _ Nil) = [l]
+getChildren (Branch l _ r) = [l,r]
+
+value (Branch _ x _) = x
+
+childs1 :: [Tree a] -> [Tree a]
+childs1 [] = []
+childs1 ts = let res = concatMap getChildren ts in 
+    ts ++ childs1 res
 
 instance Foldable Levelorder where
+    -- f :: a -> b -> b
+    -- foldr :: (a -> b -> b) -> b -> b
     foldr f ini (LevelO Nil)             = ini
-    foldr f ini  (LevelO t) = foldr f ini (gg t) where
-        gg :: Tree a -> [a]
-        gg (Branch Nil v Nil) =  [v]
-        gg (Branch Nil v r1) = v : (head.gg $ r1) : (tail.gg $ r1) 
-        gg (Branch l1 v Nil) = v : (head.gg $ l1) : (tail.gg $ l1) 
-        gg (Branch l1 v r1) = v : (head.gg $ l1) : (head.gg $ r1) : ((tail.gg $ l1) ++ (tail.gg $ r1))
-    -- [3,1,4,2]
+    foldr f ini (LevelO (Branch l x r)) = f x (undefined) 
 
-
-tree2 = (Branch (Branch (Branch Nil 'A' Nil) 'B' (Branch (Branch Nil 'C' Nil) 'D' (Branch Nil 'E' Nil))) 'F' (Branch Nil 'G' (Branch (Branch Nil 'H' Nil) 'I' Nil)))
+    -- something working: map value $ childs1 [treeLection]
