@@ -70,15 +70,20 @@ getChildren (Branch l _ r) = [l,r]
 
 value (Branch _ x _) = x
 
-childs1 :: [Tree a] -> [Tree a]
-childs1 [] = []
-childs1 ts = let res = concatMap getChildren ts in 
-    ts ++ childs1 res
+childs :: [Tree a] -> [Tree a]
+childs [] = []
+childs ts = let res = concatMap getChildren ts in ts ++ childs res
+
+levelOrder :: Tree a -> [Tree a]
+levelOrder t = childs [t]
 
 instance Foldable Levelorder where
-    -- f :: a -> b -> b
-    -- foldr :: (a -> b -> b) -> b -> b
-    foldr f ini (LevelO Nil)             = ini
-    foldr f ini (LevelO (Branch l x r)) = f x (undefined) 
+    foldr _ ini (LevelO Nil) = ini
+    foldr f ini (LevelO t)   = foldr f ini $ value <$> levelOrder t
 
-    -- something working: map value $ childs1 [treeLection]
+-- !!! awesome short from solutions
+-- instance Foldable Levelorder where    
+--     foldr f ini (LevelO tree) = levelorder [tree] where
+--         levelorder [] = ini
+--         levelorder (Nil:xs) = levelorder xs
+--         levelorder ((Branch l x r):xs) = f x (levelorder (xs ++ [l,r]))
