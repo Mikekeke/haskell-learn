@@ -87,3 +87,24 @@ instance Foldable Levelorder where
 --         levelorder [] = ini
 --         levelorder (Nil:xs) = levelorder xs
 --         levelorder ((Branch l x r):xs) = f x (levelorder (xs ++ [l,r]))
+
+-- more good
+-- instance  Foldable Levelorder  where
+--     foldr f b (LevelO tree) = go b [tree] where
+--       go acc [] = acc
+--       go acc (t:ts) = case t of
+--         Nil -> go b ts
+--         Branch l a r -> f  a (go acc (ts++[l,r]))
+
+-- -----------------------------------------------------
+-- next Nil = []
+-- next (Branch l v r) = [l, r]
+
+-- value Nil = []
+-- value (Branch l v r) = [v]
+
+-- instance Foldable Levelorder where
+--   foldr f x (LevelO tree) = let
+--      calc [] = x
+--      calc level = foldr f (calc (level >>= next)) (level >>= value)
+--      in calc [tree]
