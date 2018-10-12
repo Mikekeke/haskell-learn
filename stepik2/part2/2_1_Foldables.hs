@@ -108,3 +108,10 @@ instance Foldable Levelorder where
 --      calc [] = x
 --      calc level = foldr f (calc (level >>= next)) (level >>= value)
 --      in calc [tree]
+
+mkEndo :: Foldable t => t (a -> a) -> Endo a
+mkEndo = foldr (mappend . Endo) (Endo id)
+-- or
+-- mkEndo = foldMap Endo
+-- or
+-- mkEndo = Endo . foldr (.) id 

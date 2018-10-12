@@ -5,6 +5,7 @@ import Data.List
 import Debug.Trace
 import Control.Monad.State
 import Control.Monad.Except
+import Data.Monoid
 
 foo, bar :: Int
 foo = 10
@@ -38,3 +39,4 @@ m4 = maker (Left "kek")
 --     return = Good
 --     (Good a) >>= k = k a
 --     (FuckUp b) >>= k = and ???
+
