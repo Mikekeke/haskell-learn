@@ -1,3 +1,5 @@
+{-# LANGUAGE TypeOperators #-}
+
 import           Data.Monoid
 
 data Triple a = Tr a a a  deriving (Eq,Show)
@@ -115,3 +117,16 @@ mkEndo = foldr (mappend . Endo) (Endo id)
 -- mkEndo = foldMap Endo
 -- or
 -- mkEndo = Endo . foldr (.) id 
+
+infixr 9 |.|
+newtype (|.|) f g a = Cmps { getCmps :: f (g a) }  deriving (Eq,Show)
+
+instance (Foldable f, Foldable g) => Foldable (f |.| g) where
+    foldMap = undefined
+    -- or
+    foldr f ini cnt = foldr innerFold ini (getCmps cnt) where
+        fn :: g a -> b
+        fn = foldr f ini
+        innerFold :: g a -> b -> b
+        innerFold = undefined
+        -- innerFold ga b = undefined

@@ -58,6 +58,12 @@ daayum...
     -- Cmps {getCmps = [Cmps {getCmps = [[42]]}]}
     -- λ: pure 42 :: ([] |.| [] |.| [] |.| []) Int
     -- Cmps {getCmps = [Cmps {getCmps = [Cmps {getCmps = [[42]]}]}]}
+    -- a = Cmps {getCmps = [Cmps {getCmps = [[42]]}]}
+    -- b = getCmps <$> a
+    -- ~> b = [Cmps {getCmps = [[42]]}]
+    -- c = getCmps <$> b
+    -- ~> c = [[[42]]]
+
     unCmps3 :: Functor f => (f |.| g |.| h) a -> f (g (h a))
     unCmps3 x = getCmps <$> getCmps x
     unCmps4 :: (Functor f2, Functor f1) => (f2 |.| f1 |.| g |.| h) a -> f2 (f1 (g (h a)))
