@@ -120,13 +120,13 @@ mkEndo = foldr (mappend . Endo) (Endo id)
 
 infixr 9 |.|
 newtype (|.|) f g a = Cmps { getCmps :: f (g a) }  deriving (Eq,Show)
-
+-- length $ Cmps [[1,2], [], [3,4,5,6,7]]
 instance (Foldable f, Foldable g) => Foldable (f |.| g) where
-    foldMap = undefined
+    foldMap fn = foldMap (foldMap fn) . getCmps
     -- or
-    foldr f ini cnt = foldr innerFold ini (getCmps cnt) where
-        fn :: g a -> b
-        fn = foldr f ini
-        innerFold :: g a -> b -> b
-        innerFold = undefined
-        -- innerFold ga b = undefined
+    -- foldr f ini = foldr (\ga b -> foldr f b ga) ini . getCmps 
+    -- shorter 
+    foldr f ini = foldr (flip $ foldr f) ini . getCmps
+    
+    -- from solutions
+    -- instance (Foldable a, Foldable b)=>Foldable (a |.| b) where foldMap = (. getCmps).foldMap.foldMap
