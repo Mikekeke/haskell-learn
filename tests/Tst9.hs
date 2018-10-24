@@ -1,5 +1,6 @@
 {-# LANGUAGE BangPatterns #-}
-{-# LANGUAGE FlexibleContexts      #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE ViewPatterns #-}
 
 import Data.List
 import Debug.Trace
@@ -24,7 +25,7 @@ m2 = maker Nothing
 m3 = maker (Right 3) 
 m4 = maker (Left "kek")
 
-
+-- collect monadic error?
 -- data KekError b a = Good a | FuckUp b deriving Show
 
 -- instance Monoid b => Functor (KekError b) where
@@ -38,5 +39,5 @@ m4 = maker (Left "kek")
 -- instance Monoid b => Monad (KekError b) where
 --     return = Good
 --     (Good a) >>= k = k a
---     (FuckUp b) >>= k = and ???
+--     (FuckUp b) >>= k = and what ???
 

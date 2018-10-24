@@ -1,4 +1,6 @@
 import Control.Applicative
+import Data.Monoid
+
 traverse2list :: (Foldable t, Applicative f) => (a -> f b) -> t a -> f [b]
 -- traverse2list f = foldr (\x b -> (:) <$> f x <*> b) (pure [])
 traverse2list f = foldr (liftA2 (:) . f) (pure [])
@@ -62,5 +64,26 @@ instance Traversable Result where
     -- stepik team
     -- traverse _ (Error e) = pure $ Error e
 
-    sequenceA (Ok fa) = Ok <$> fa
-    sequenceA (Error s) = Error <$> (pure s)
+    sequenceA (Ok cont) = Ok <$> cont
+    sequenceA (Error s) = pure (Error s)
+
+
+-- =====================================================
+data Tree a = Nil | Branch (Tree a) a (Tree a)  deriving (Eq, Show)
+
+instance Functor Tree where
+    fmap _ Nil = Nil
+    fmap f (Branch l x r) = Branch (fmap f l) (f x) (fmap f r)
+
+instance Applicative Tree where
+    pure x = Branch Nil x Nil
+    (Branch la f ra) <*> (Branch l x r) = Branch (la <*> l) (f x) (ra <*>r)
+    _ <*> _ = Nil
+
+instance Foldable Tree where
+    foldMap _ Nil = mempty
+    foldMap f (Branch l x r) = (foldMap f l) <> f x <> (foldMap f r)
+
+instance Traversable Tree where
+    sequenceA Nil = pure Nil
+    sequenceA (Branch l cont r) = Branch <$> sequenceA l <*> cont <*> sequenceA r
