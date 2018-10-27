@@ -1,5 +1,7 @@
-import Control.Applicative
-import Data.Monoid
+{-# LANGUAGE TypeOperators #-}
+
+import           Control.Applicative
+import           Data.Monoid
 
 traverse2list :: (Foldable t, Applicative f) => (a -> f b) -> t a -> f [b]
 -- traverse2list f = foldr (\x b -> (:) <$> f x <*> b) (pure [])
@@ -41,7 +43,7 @@ instance Traversable Triple where
 data Result a = Ok a | Error String deriving (Eq,Show)
 
 instance Functor Result where
-    fmap f (Ok a) = Ok $ f a
+    fmap f (Ok a)    = Ok $ f a
     fmap _ (Error s) = Error s
 
 instance Applicative Result where
@@ -52,14 +54,14 @@ instance Applicative Result where
 
 instance Foldable Result where
     foldr f ini (Ok a) = f a ini
-    foldr _ ini _ = ini
+    foldr _ ini _      = ini
 
     -- from solutions
     foldMap f (Ok x)    = f x
     foldMap _ (Error _) = mempty
 
 instance Traversable Result where
-    traverse f (Ok a) = Ok <$> (f a)
+    traverse f (Ok a)    = Ok <$> (f a)
     traverse _ (Error s) = Error <$> (pure s)
     -- stepik team
     -- traverse _ (Error e) = pure $ Error e
@@ -72,7 +74,7 @@ instance Traversable Result where
 data Tree a = Nil | Branch (Tree a) a (Tree a)  deriving (Eq, Show)
 
 instance Functor Tree where
-    fmap _ Nil = Nil
+    fmap _ Nil            = Nil
     fmap f (Branch l x r) = Branch (fmap f l) (f x) (fmap f r)
 
 instance Applicative Tree where
@@ -81,9 +83,39 @@ instance Applicative Tree where
     _ <*> _ = Nil
 
 instance Foldable Tree where
-    foldMap _ Nil = mempty
+    foldMap _ Nil            = mempty
     foldMap f (Branch l x r) = (foldMap f l) <> f x <> (foldMap f r)
 
 instance Traversable Tree where
     sequenceA Nil = pure Nil
     sequenceA (Branch l cont r) = Branch <$> sequenceA l <*> cont <*> sequenceA r
+
+-- ==========================================================
+infixr 9 |.|
+newtype (|.|) f g a = Cmps { getCmps :: f (g a) }  deriving (Eq,Show)
+
+instance (Functor f, Functor g) => Functor (f |.| g) where
+    --  fmap :: (a -> b) -> (f |.| g) a -> (f |.| g) b
+    --  fmap :: (a -> b) -> (|.|) f g a -> (|.|) f g b
+     fmap fn (Cmps x) = Cmps $ fmap (fmap fn) x
+     -- shorter
+    --  fmap fn cmps = Cmps $ (fmap.fmap) fn (getCmps cmps)
+
+instance (Applicative f, Applicative g) => Applicative (f |.| g) where
+    pure = Cmps . pure . pure
+    (Cmps fn) <*> (Cmps x) = Cmps $ fmap (<*>) fn <*> x
+
+instance (Foldable f, Foldable g) => Foldable (f |.| g) where
+    foldMap fn = foldMap (foldMap fn) . getCmps
+    -- or
+    -- foldr f ini = foldr (\ga b -> foldr f b ga) ini . getCmps
+    -- shorter
+    foldr f ini = foldr (flip $ foldr f) ini . getCmps
+
+instance (Traversable f, Traversable g) => Traversable (f |.| g) where
+    traverse f (Cmps fga) = Cmps <$> traverse (traverse f) fga
+
+    -- from solutions
+    -- sequenceA (Cmps fgapl) = Cmps <$> sequenceA (sequenceA <$> fgapl)
+    -- sequenceA = fmap Cmps . (traverse sequenceA . getCmps)
+    -- traverse p = fmap Cmps . (traverse . traverse) p . getCmps
