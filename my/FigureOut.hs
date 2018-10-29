@@ -17,6 +17,14 @@ perms' (x:xs) = concatMap (insertElem x) (perms' xs) where
     insertElem x []         = [[x]]
     insertElem x yss@(y:ys) = (x:yss) : map (y:) (insertElem x ys)
 
+-- todo
+-- !@#$% still trying permutations
+merge :: [a] -> [a] -> [[a]]
+merge [] r = []
+merge l [] = [l]
+merge (x:xs) l = r1 ++ merge xs l where
+    r1 = map (\x1 -> [x,x1]) l
+
 -- understood
 group' :: Eq a => [a] -> [[a]]
 group' [] = []
