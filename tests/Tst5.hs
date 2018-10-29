@@ -11,4 +11,5 @@ comb' l1 l2 = do
      [f x]
 
 comb'' :: [a -> a] -> [a] -> [a]
-comb'' fs xs = fs >>= flip map xs 
+-- comb'' fs xs = fs >>= flip map xs 
+comb'' fs xs = fs >>= (`map` xs) 

@@ -119,3 +119,16 @@ instance (Traversable f, Traversable g) => Traversable (f |.| g) where
     -- sequenceA (Cmps fgapl) = Cmps <$> sequenceA (sequenceA <$> fgapl)
     -- sequenceA = fmap Cmps . (traverse sequenceA . getCmps)
     -- traverse p = fmap Cmps . (traverse . traverse) p . getCmps
+
+
+-- some my tests
+seqA :: Applicative f => [f a] -> f [a]
+seqA [] = pure []
+seqA (x:xs) = (:) <$> x <*> seqA xs
+
+ap' :: [[a] -> [a]] -> [[a]] -> [[a]]
+ap' l1 l2 = [f x | f <- l1, x <- l2]
+seqList :: [[a]]-> [[a]]
+-- not! seqList [] = [] - coz effect of empty list, any seqList will return []
+seqList [] = [[]]
+seqList (x:xs) = ((:) <$> x) `ap'` seqList xs
