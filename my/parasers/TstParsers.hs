@@ -75,6 +75,7 @@ tst :: Monoid e => Either a (Validated e Person)
 tst = pr <<*>> p1 <<*>> p2 <<*>> p3
 -- ~> Right (Valid (Person {name = "Bob", age = 22, gender = M}))
 -- sample - END
+
 validateName :: String -> Validated [String] String
 validateName n = case isUpper (head n) of
     True -> Valid n
@@ -88,8 +89,6 @@ validateAge x = case x <= 0 || x > 120 of
 validatedNameP = validateName <$> parserName
 validatedAgeP = validateAge <$> parserAge
 validatedGenP = pure <$> parserGender
-
-
 
 parserPersonV :: Parsec String u (Validated [String] Person)
 -- parserPersonV = pure (Valid Person) <<*>> validatedNameP... - works too
