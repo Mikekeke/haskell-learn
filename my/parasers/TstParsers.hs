@@ -56,7 +56,7 @@ instance Monoid e => Applicative (Validated e) where
 It will parse all input with Validated, so it's easier to just parse Person straight and validate ADT
 But if use Maybe isnted of Validated, then it not gona parse further (tested wint bad name and "validateAge = undefined")
 and will return Nothing (or Right Nothing with runParser).
-But maybe better validate and stop it on parser level with domain error - need to figure out how if possible 
+!!! But maybe better validate and stop it on parser level with domain error - need to figure out how if possible 
 -}
 
 (<<$>>) :: (Functor f2, Applicative f1) => f1 (a -> b) -> f1 (f2 a) -> f1 (f2 b)
