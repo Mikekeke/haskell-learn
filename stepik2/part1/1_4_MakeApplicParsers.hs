@@ -67,6 +67,11 @@ crazyChar  = Parser f where
     f (c:cs) = [(pred c,cs), (c,cs),(succ c,cs)] 
 tst1 =  apply ((,) <$> anyChar <*> crazyChar) "059"
 -- ~> [(('0','4'),"9"),(('0','5'),"9"),(('0','6'),"9")]
+data Ab = Ab Char Char deriving Show
+tst2 = apply (Ab <$> crazyChar <*> anyChar ) "ab"
+-- ~> [(Ab '`' 'b',""),(Ab 'a' 'b',""),(Ab 'b' 'b',"")]
+tst3 = apply (Ab <$> anyChar <*> crazyChar ) "ab"
+-- ~> [(Ab 'a' 'a',""),(Ab 'a' 'b',""),(Ab 'a' 'c',"")]
 
 
 -- *** tasks ***
