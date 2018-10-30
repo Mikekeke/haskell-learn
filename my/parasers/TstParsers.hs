@@ -1,40 +1,30 @@
-module TstParsers where
+import Text.Parsec
+import Data.Char
 
--- http://dev.stephendiehl.com/fun/002_parsers.html
+data Abc = Abc Char Char Char deriving Show
+getChr n s = s !! n
+parceAbc= Abc <$> getChr 0 <*>  getChr 1 <*>  getChr 2
+tstAbc = parceAbc "abc"
 
-import           Control.Applicative
-import           Control.Monad
-import           Data.Char
+data Gender = M | F | NA deriving (Eq, Show)
+data Person = Person {name::String, age::Int, gender::Gender} deriving Show
 
+rarserGender :: Parsec String u Gender
+parserMale = M <$ (string "M" <|> string "male")
+parserFemale = F <$ (string "F" <|> string "female")
+rarserGender =  parserMale <|> parserFemale <|> pure NA
 
--- to undersand
-myConcatMap :: (a -> [b]) -> [a] -> [b]
-myConcatMap _ []     = []
-myConcatMap f (x:xs) = (f x) ++ (myConcatMap f xs)
+parserName :: Parsec String u String
+parserName = many1 (satisfy isAlpha)
 
-myConcatMap2 f = foldr ((++) . f) []
--- to undersand
+parserAge :: Parsec String u Int
+parserAge = read <$> many1 digit
 
+parserPerson = Person <$> parserName <*> (space *> parserAge) <*> (optional space *> rarserGender)
+validatePerson p | age p > 100 = Left "bad age"
+                 | otherwise = Right p
 
-newtype Parser a = Parser {parse :: String -> [(a, String)]}
-
-runParser :: Parser a -> String -> a
-runParser parser input = case parse parser input of
-    [(res, [])] -> res
-    [(_, rest)] ->  error $ "Parser did not consume entire stream. Left: " ++ (show rest)
-    _           -> error "Parser error."
-
-item :: Parser Char
-item = Parser $ \s ->
-  case s of
-   []     -> []
-   (c:cs) -> [(c,cs)]
-
-bind :: Parser a -> (a -> Parser b) -> Parser b
-bind p f = Parser $ \s -> concatMap (\(a, s') -> parse (f a) s') $ parse p s
-
-unit :: a -> Parser a
-unit a = Parser $ \s -> [(a,s)]
-
-instance Functor Parser where
-    fmap f p = Parser $ \s -> [(f a, b) | (a, b) <- parse p s]
+good1 = "Bob 43 M"
+good2 = "Bob 43"
+bad = "Bob 800 M"
+tstParsePerson = parseTest (validatePerson <$> parserPerson) 
