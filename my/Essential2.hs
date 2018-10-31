@@ -6,6 +6,14 @@ sequence' :: Monad m => [m a] -> m [a]
 sequence' []     = return []
 sequence' (x:xs) = x >>= \v -> fmap ((:) v) (sequence' xs)
 -- Just 4 >>= \4 -> fmap (4:) (Just [])
+{-
+(sequence == sequenceA == traverse id == foldr (\x ys -> (:) <$> (id x) <*> ys) (pure [])
+f :: [a] -> (a, [a])
+λ: :t Just f
+Just f :: Maybe ([a] -> (a, [a]))
+λ: :t sequence (Just f)
+sequence (Just f) :: [a] -> Maybe (a, [a])
+-}
 
 
 sequence'' :: Monad m => [m a] -> m [a]

@@ -52,13 +52,29 @@ instance Applicative Parser where
 -- apply ((,) <$> anyChar <*> anyChar) "ABCD" ~> [(('A', 'B'), "CD")]
 --            ^^^ здесь комбинация 3х парсеров: (pure (,) <*> anyChar <*> anyChar), pure (,) ничего не делает с воодомштыеф
 
-
 instance Alternative Parser where
     empty = Parser $ \_ -> []
     lp <|> rp = Parser $ \s ->
         case apply lp s of
             [] -> apply rp s
             rs -> rs
+
+
+{-
+(from where all this comment started: (replicateM 3 digit) will parse 3 digit - how?)
+e.g 
+fn :: String -> [(Char, String)]
+fn = \s -> [(head s, tail s)]
+replicate 2 (Parser fn)
+~> [Parser (\s -> [(head s, tail s)]), Parser (\s -> [(head s, tail s)])]
+(sequence == sequenceA == traverse id == foldr (\x ys -> (:) <$> (id x) <*> ys) (pure [])
+traverse id [Parser (\s -> [(head s, tail s)]), Parser (\s -> [(head s, tail s)])]   
+ ~> foldr (\x ys -> (:) <$> (id x) <*> ys) (pure []) [Parser (\s -> [(head s, tail s)], Parser (\s -> [(head s, tail s)]]
+ ~> (:) <$> id (Parser (\s -> (head s, tail s))) <*> (foldr (\x ys -> (:) <$> (id x) <*> ys) (pure []) [Parser (\s -> [(head s, tail s)]])
+ ~> (:) <$> Parser (\s -> [a1, b1)]) <*> ((:) <$> Parser (\s -> [(a2, b2)]) <*> Parser (\s-> [([],s)]))
+ ~> (:) <$> Parser (\s -> [a1, b1)]) <*> (Parser (\s -> map (\(a,b) -> ((:) a, b)) (apply (Parser (\s -> [(a2, b2)])) s)) <*> Parser (\s-> [([],s)]))
+ ~> (:) <$> Parser (\s -> [a1, b1)]) <*> (Parser (\s -> map (\(a,b) -> ((:) a, b)) (\s -> [(a2, b2)]) $ s)) <*> Parser (\s-> [([],s)]))
+-}
 
 -- якобы разбирает неоднозначно
 crazyChar :: Parser Char
