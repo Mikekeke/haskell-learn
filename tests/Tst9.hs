@@ -41,3 +41,8 @@ m4 = maker (Left "kek")
 --     (Good a) >>= k = k a
 --     (FuckUp b) >>= k = and what ???
 
+
+removNb :: Integer-> [(Integer, Integer)]
+removNb n = [(a,b) | a <- l, b <- tail l, (a*b) == (sum $ filter (\x -> x /=a  && x /=b ) l)] 
+    where l = [1..n]
+
