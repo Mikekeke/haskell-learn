@@ -2,11 +2,13 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE ViewPatterns #-}
 
+
 import Data.List
 import Debug.Trace
 import Control.Monad.State
 import Control.Monad.Except
 import Data.Monoid
+
 
 foo, bar :: Int
 foo = 10
@@ -42,7 +44,16 @@ m4 = maker (Left "kek")
 --     (FuckUp b) >>= k = and what ???
 
 
-removNb :: Integer-> [(Integer, Integer)]
-removNb n = [(a,b) | a <- l, b <- tail l, (a*b) == (sum $ filter (\x -> x /=a  && x /=b ) l)] 
-    where l = [1..n]
+grpByFld :: (a -> a -> Bool) -> [a] -> [[a]]
+grpByFld p l@(x:y:xs) = foldr f [] l where
+    f x1 [] = [[x1]] 
+    f x1 (h:t)  | p x1 (head h) = (x1 : h) : t
+               | otherwise = [x1] : h : t
+grpByFld _ l = [l]
+
+grpByReq :: (a -> a -> Bool) -> [a] -> [[a]]
+grpByReq p (x1:x2:xs)
+    | p x1 x2 = let (x2s:xxs) = groupBy p (x2:xs) in (x1:x2s):xxs
+    | otherwise = [x1] : grpByReq p (x2:xs)
+grpByReq _ l = [l] 
 
