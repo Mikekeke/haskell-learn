@@ -132,3 +132,8 @@ seqList :: [[a]]-> [[a]]
 -- not! seqList [] = [] - coz effect of empty list, any seqList will return []
 seqList [] = [[]]
 seqList (x:xs) = ((:) <$> x) `ap'` seqList xs
+
+-- lol I did it again
+seqAL :: [[a]] -> [[a]]
+seqAL [] = [[]]
+seqAL (x:xs) = (:) <$> x <*> seqAL xs

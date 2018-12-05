@@ -35,5 +35,4 @@ info:
 new knowledge:
 - u can compare touples, copares by 1st member; thats why "zip ls [0..]" and need swap after
 - unzip :: [(a, b)] -> ([a], [b])
-
 -}
