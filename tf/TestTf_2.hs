@@ -5,35 +5,40 @@
 import Data.Char
 import Control.Monad.State
 import Control.Monad.Identity
-import           Control.Monad.Except
+import Control.Monad.Except
 
 type Id = Int
 data User = User {name :: String} deriving Show
+type Database a = [(Int, a)]
+data AppError = UserNotFound | UserNotValid deriving Show
 
 class Monad m => DatabaseAlg m where
     getUser :: Id -> m User
     insertUser :: User -> m Id
 
-test1 :: DatabaseAlg m => m User
+class Monad m => ValidationAlg m where
+    checkUser :: User -> m (Either AppError User)
+
+test1 :: (DatabaseAlg m, ValidationAlg m) => m User
 test1 = do id_ <- insertUser (User "TestName")
-           id_2 <- insertUser (User "TestName2")
-           getUser 10
+           let u1 = (User "testName2")
+           checkUser u1
+           id_2 <- insertUser u1
+           getUser 2
 
-type Database a = [(Int, a)]
-data AppError = UserNotFound deriving Show
 
-newtype AppUser m a = AppUser {unApp:: StateT (Database User) m a} deriving (Functor, Applicative, Monad, MonadState (Database User))
--- newtype AppUser2 a = AppUser2 {unApp2:: State [(Int, User)] a} deriving (Functor, Applicative, Monad)
+
+newtype AppUser m a = AppUser {getApp:: StateT (Database User) (ExceptT AppError m) a} deriving (Functor, Applicative, Monad, MonadState (Database User), MonadError AppError)
 
 testState1 = []
-runApp app = runStateT (unApp app) testState1
+runApp app = runExceptT (runStateT (getApp app) testState1)
 
 
 instance DatabaseAlg (AppUser IO) where
     getUser id_ = do user <- gets (lookup id_)
                      case user of
                         Just u -> return u
-                        _ -> fail "my-err"
+                        _ -> throwError UserNotFound
 
     insertUser user = do db <- get
                          case null db of
@@ -48,7 +53,7 @@ instance DatabaseAlg (AppUser Maybe) where
                     user <- gets (lookup id_)
                     case user of
                         Just u -> return u
-                        _ -> fail ""
+                        _ -> throwError UserNotFound
 
     insertUser user = do db <- get
                          case null db of
@@ -57,10 +62,15 @@ instance DatabaseAlg (AppUser Maybe) where
                             False -> do let nextId = succ . fst . last $ db
                                         modify ((nextId, user) : )
                                         return nextId
-main1 :: IO (User, Database User)
-main1 = runApp test1
 
-main2 :: Maybe (User, Database User)
+instance ValidationAlg (AppUser Maybe) where
+    checkUser u = case isUpper . head . name $ u of 
+        True -> return (Right u)
+        _ -> throwError UserNotValid
+-- main1 :: IO (Either AppError (User, Database User))
+-- main1 = runApp test1
+
+main2 :: Maybe (Either AppError (User, Database User))
 main2 = runApp test1
 
 
