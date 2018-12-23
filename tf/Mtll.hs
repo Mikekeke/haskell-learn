@@ -21,23 +21,24 @@ rt :: Monad m =>  ReaderT [a] m a
 rt = reader head
 
 
-{-************************************************************************-}
-import Control.Monad.Reader
-import Control.Monad.State
-import Debug.Trace
+{-************************************************************************
+ import Control.Monad.Reader
+ import Control.Monad.State
+ import Debug.Trace
 
-class GetAlg m where
-    getX :: Int -> m a
+ class GetAlg m where
+     getX :: Int -> m a
 
 
-mb = Just "new"
+ mb = Just "new"
 
-type App = ReaderT String (StateT String Maybe)
+ type App = ReaderT String (StateT String Maybe)
 
-tst1 :: App String
-tst1 = do
-    x <- get
-    y <- ask
-    n <- lift . lift $ mb
-    modify ((n ++ " ") ++)
-    return $ x ++ y
+ tst1 :: App String
+ tst1 = do
+     x <- get
+     y <- ask
+     n <- lift . lift $ mb
+     modify ((n ++ " ") ++)
+     return $ x ++ y
+-}

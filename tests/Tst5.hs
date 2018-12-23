@@ -1,15 +1,5 @@
-ls1 = [(+1), (*2)]
-ls2 = [1,2,3]
+import Data.Monoid
 
-comb :: [a -> a] -> [a] -> [a]
-comb l1 l2 = [f x | f <- l1, x <- l2]
 
-comb' :: [a -> a] -> [a] -> [a]
-comb' l1 l2 = do
-     f <- l1
-     x <- l2
-     [f x]
-
-comb'' :: [a -> a] -> [a] -> [a]
--- comb'' fs xs = fs >>= flip map xs 
-comb'' fs xs = fs >>= (`map` xs) 
+fldr :: (a -> b -> b) -> b -> [a] -> b
+fldr f z c = appEndo (foldMap (Endo . f) c) z
