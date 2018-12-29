@@ -29,4 +29,6 @@ fixFilter = fix (\rec p l -> case l of {
 fn x = if x < 3 then 3 else fn (x - 1)
 fn' = fix $ \f x ->  if x < 3 then 3 else f (x - 1)
 -- fn 30 == fn' 20 is True
-    
+
+f1 :: (Integer -> Bool) -> Integer -> Integer
+f1 = fix (\recFun p x -> if p x then 3 else recFun p (x+1))
