@@ -28,7 +28,7 @@ test1 = do id_ <- insertUser (User "TestName")
 
 
 
-newtype AppUser m a = AppUser {getApp:: StateT (Database a) (ExceptT AppError m) a} deriving (Functor, Applicative, Monad, MonadState (Database User), MonadError AppError)
+newtype AppUser m a = AppUser {getApp:: StateT (Database User) (ExceptT AppError m) a} deriving (Functor, Applicative, Monad, MonadState (Database User), MonadError AppError)
 
 testState1 = []
 runApp app = runExceptT (runStateT (getApp app) testState1)
