@@ -26,3 +26,16 @@ instance Monad PrsE where
   (>>=) (PrsE v) k = PrsE $ \s -> (v s) >>= uncurry (runPrsE . k)
 
 -}
+
+
+data OddC a = Un a | Bi a a (OddC a) deriving (Eq,Show)
+
+concat3OC :: OddC a -> OddC a -> OddC a -> OddC a
+concat3OC (Un x) (Un y) odd' = Bi x y odd'
+concat3OC (Un x1) (Bi y1 y2 u) c = Bi x1 y1 (concat3OC (Un y2) u c)
+concat3OC (Bi x1 x2 u) b c = Bi x1 x2 (concat3OC u b c)
+
+tst1 = Bi 'a' 'b' (Un 'c')
+tst2 = Bi 'd' 'e' (Bi 'f' 'g' (Un 'h'))
+tst3 = Bi 'i' 'j' (Un 'k')
+tst = concat3OC tst1 tst2 tst3 == Bi 'a' 'b' (Bi 'c' 'd' (Bi 'e' 'f' (Bi 'g' 'h' (Bi 'i' 'j' (Un 'k')))))
