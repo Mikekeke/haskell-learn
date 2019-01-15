@@ -63,6 +63,16 @@ instance Monad OddC where
     (Bi a b oddC) >>= k = concatOC $ Bi (k a) (k b) $ Un (oddC >>= k) 
     -- looks like fmap that needs to be concated, realized after seeing solutions (see below)
 
+{-
+if f produce same type, then:
+f = \x -> []
+(concat $ fmap f [1,2]) == ([1,2] >>= f)
+or more general:
+(join $ fmap f [1,2]) == ([1,2] >>= f)
+will result:
+True
+-}
+
 tst1m = Bi 10 20 (Un 30)
 tst2m = Bi 1 2 (Bi 3 4 (Un 5))
 
