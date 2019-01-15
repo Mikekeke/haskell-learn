@@ -61,7 +61,7 @@ instance Monad OddC where
     return = Un
     (Un a) >>= k = k a
     (Bi a b oddC) >>= k = concatOC $ Bi (k a) (k b) $ Un (oddC >>= k) 
-    -- looks like fmap that needs to be concatted (doesn't change effect, coz no [] or Nothing (I think)), realized after seeing solutions (see below)
+    -- looks like fmap that needs to be concated, realized after seeing solutions (see below)
 
 tst1m = Bi 10 20 (Un 30)
 tst2m = Bi 1 2 (Bi 3 4 (Un 5))
