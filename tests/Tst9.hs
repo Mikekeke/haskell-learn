@@ -57,3 +57,6 @@ grpByReq p (x1:x2:xs)
     | otherwise = [x1] : grpByReq p (x2:xs)
 grpByReq _ l = [l] 
 
+cnctReq :: [[a]] -> [a]
+cnctReq [] = []
+cnctReq (ys:xss) = foldr (:) (cnctReq xss) ys

@@ -30,3 +30,19 @@ satisfyEP pr = PrsEP (f . succ) where
     f pos (c:cs) | pr c      = (pos, Right (c, cs))
                  | otherwise = (pos, Left ("pos " ++ show pos ++ ": unexpected " ++ [c]))
 -}
+
+instance Functor PrsEP where
+    -- fmap f (PrsEP g) = PrsEP $ \i s -> case g i s of
+        -- (pos, Right (a, rest)) -> (pos, Right (f a,  rest))
+        -- (pos, Left e) -> (pos, Left e)
+
+    fmap f (PrsEP g) = PrsEP $ \i s -> fmap (fmap $ \(v,_) -> (f v, s)) (g i s)
+
+instance Applicative PrsEP where
+    pure x = PrsEP $ \_ s -> (0, Right (x, s))
+    (PrsEP l) <*> (PrsEP r) = PrsEP $ \i s -> let 
+        (i1, f) = l i s 
+        sm = f >>= \(fn, rest) -> undefined
+        in undefined
+
+
