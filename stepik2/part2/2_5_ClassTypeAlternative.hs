@@ -1,3 +1,7 @@
+import Debug.Trace
+import Control.Applicative (Alternative (..), (<|>))
+
+
 newtype PrsEP a = PrsEP { runPrsEP :: Int -> String -> (Int, Either String (a, String)) }
 
 parseEP :: PrsEP a -> String -> Either String (a, String)
@@ -32,17 +36,38 @@ satisfyEP pr = PrsEP (f . succ) where
 -}
 
 instance Functor PrsEP where
-    -- fmap f (PrsEP g) = PrsEP $ \i s -> case g i s of
-        -- (pos, Right (a, rest)) -> (pos, Right (f a,  rest))
-        -- (pos, Left e) -> (pos, Left e)
-
-    fmap f (PrsEP g) = PrsEP $ \i s -> fmap (fmap $ \(v,_) -> (f v, s)) (g i s)
+    fmap f (PrsEP g) = PrsEP $ \i s -> fmap (fmap $ \(v,s1) -> (f v, s1)) (g i s)
 
 instance Applicative PrsEP where
-    pure x = PrsEP $ \_ s -> (0, Right (x, s))
-    (PrsEP l) <*> (PrsEP r) = PrsEP $ \i s -> let 
-        (i1, f) = l i s 
-        sm = f >>= \(fn, rest) -> undefined
-        in undefined
+    pure x = PrsEP $ \i s -> (i, Right (x, s))
+    (PrsEP pAp) <*> (PrsEP p) = PrsEP $ \i s -> 
+        case pAp i s of
+            (i1, Left e) -> (i1, Left e)
+            (i1, Right (f, s1)) -> case p i1 s1 of
+                (i2, Left e) -> (i2, Left e)
+                (i2, Right (v, s2)) -> (i2, Right (f v, s2))
 
+anyEP = satisfyEP (const True)
+testP = (,) <$> anyEP <* charEP 'B' <*> anyEP
 
+{-
+staff's solution
+instance Functor PrsEP where
+  fmap f = PrsEP . (fmap . fmap . fmap . fmap $ \(a, s) -> (f a, s)) . runPrsEP
+
+instance Applicative PrsEP where
+  pure x = PrsEP $ \i s -> (i, Right (x, s))
+  pf <*> px = PrsEP $ \i s -> case runPrsEP pf i s of
+                (i', Left e) -> (i', Left e)
+                (i', Right (f, s')) -> runPrsEP (f <$> px) i' s'
+-}
+
+instance Alternative PrsEP where
+    empty = PrsEP $ \i _ -> (i, Left $ "pos " ++ show i ++ ": empty alternative")
+    pl<|>pr = PrsEP $ \i s -> case runPrsEP pl i s of
+        lftP@(i1, Left _) -> case runPrsEP pr i s of
+            rghtP@(i2, Left _) -> if i1 >= i2 then lftP else rghtP
+            right -> right
+        right -> right
+
+tripleP [a,b,c] = (\x y z -> [x,y,z]) <$> charEP a <*> charEP b <*>  charEP c
