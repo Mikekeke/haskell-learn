@@ -1,12 +1,3 @@
-f :: a -> b -> c
-f = undefined
-
-f1 :: b -> c
-f1 = f id
-
-f2 :: b -> c
-f2 = f const
-
 liftA2 :: (a -> b -> c) -> Maybe a -> Maybe b -> Maybe c
 liftA2 _ Nothing _ = Nothing
 liftA2 _ _ Nothing = Nothing
