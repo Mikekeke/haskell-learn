@@ -34,7 +34,7 @@ xs !!! n
                         resultFun = foldr f (Except . Left . ErrIndexTooLarge . const n) xs
                         f = (\x r i -> case i of
                             0 -> Except . Right $ x
-                            _ -> r(i-1))
+                            _ -> r (i-1))
 {-
 -- best -- null работает на бесконечных списках
 null :: t a -> Bool
@@ -54,13 +54,54 @@ xs !!! n
     go (x : xs) i = go xs (i - 1)
 -}
 
-test1 l =  f2 l
-    where 
-        f1 :: a -> (a -> a) -> a -> a
-        f1 = undefined
-        f2 :: (Foldable t, Num a) => t a -> a -> a
-        -- f2 :: t a -> (a -> a)
-        f2 = foldr f1 (+10)
 
-ft1 a b c = undefined
-fff = foldr ft1 id "Asd"
+-- to clarify !!
+-- http://hackage.haskell.org/package/base-4.12.0.0/docs/src/GHC.List.html#%21%21
+
+f' x f y = if y == 1 then f x else f (y - 1)
+fff = foldr (\x f y -> if y == 1 then f x else f (y - 1)) show [10..11]
+--    foldr (\x f -> \y -> ...)
+{-
+fn = (\x f y -> if y == 1 then f x else f (y - 1))
+foldr fn show [10,11]
+fn 10 (foldr fn show [11])
+fn 10 (fn 11 (foldr fn [] show))
+fn 10 (fn 11 (show))
+fn 10 (fn 11 show)
+fn 10 (\11 show -> \y -> if y == 1 then ...)
+fn 10 (\y -> if y == 1 then show 11 else show (y - 1))
+\10 (\y -> if y == 1 then show 11 else show (y - 1)) -> y1 -> if y1 == 1 then ...
+-- show swapped to this ^^^ lambda
+y1 -> if y1 == 1 then (\y -> if y == 1 then show 11 else show (y - 1)) 10 else (\y -> if y == 1 then show 11 else show (y - 1)) (y - 1))
+y1 = 1
+~> (\y -> if y == 1 then show 11 else show (y - 1)) 10
+~> if 10 == 1 then show 11 else show (10 - 1))
+~> 9
+-}
+
+f'' x f y = if y == 1 then f x else f (y - 1)
+fff2 = foldr (\x f y -> if y == 1 then x else f (y - 1)) id [10..11]
+{-
+fn = \x f y -> if y == 1 then x else f (y - 1)
+fn 10 (fn 11 id)
+fn 10 (\y -> if y == 1 then 11 else id (y - 1))
+\y1 -> if y == 1 then 10 else f (\y -> if y == 1 then 11 else id (y - 1)) (y1 - 1)
+
+y1 = 1
+if 1 == 1 then 10 else (\y -> if y == 1 then 11 else id (y - 1)) (y1 - 1)
+10
+
+y1 = 2
+if 2 == 1 then 10 else (\y -> if y == 1 then 11 else id (y - 1)) (2 - 1)
+(\y -> if y == 1 then 11 else id (y - 1)) 1
+if 1 == 1 then 11 else id (1 - 1))
+11
+
+y1 = 4
+if 4 == 1 then 10 else (\y -> if y == 1 then 11 else id (y - 1)) (4 - 1)
+(\y -> if y == 1 then 11 else id (y - 1)) 3
+if 3 == 1 then 11 else id (3 - 1))
+id 2
+2
+
+-}
