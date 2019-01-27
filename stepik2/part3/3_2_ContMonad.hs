@@ -1,4 +1,5 @@
 import Control.Monad (ap, return)
+import Debug.Trace
 
 -- decode c [x] = x
 -- decode c (x:xs) = foldl (\b x -> if b < x then b*x else x+b) x xs
@@ -59,4 +60,41 @@ instance Monad (Cont r) where
     return x = Cont $ \c -> c x
 --  (>>=) :: Cont r a -> (a -> Cont r b) -> Cont r b
     (Cont f) >>= k = Cont $ \c -> f (\a1 -> runCont (k a1) c)
+
+
+type Checkpointed a = (a -> Cont a a) -> Cont a a
+
+-- was in work in progress
+runCheckpointed' :: Show a => (a -> Bool) -> Checkpointed a -> a
+-- runCheckpointed :: (a -> Bool) -> ((a -> Cont a a) -> Cont a a) -> a
+runCheckpointed' p cp = runCont ff id where
+    f = \y -> Cont $ \c -> if p (c y) then c y else y
+    ff = cp f
+-- was in work in progress - END
+
+runCheckpointed :: (a -> Bool) -> Checkpointed a -> a
+runCheckpointed p cp = runCont (cp f) id where
+    f = \y -> Cont $ \c -> if p (c y) then c y else y
+    
+addTens :: Int -> Checkpointed Int
+-- addTens :: Int -> ((Int -> Cont Int Int) -> Cont Int Int)
+addTens x1 = \checkpoint -> do
+  checkpoint x1
+  let x2 = x1 + 10
+  checkpoint x2     {- x2 = x1 + 10 -}
+  let x3 = x2 + 10
+  checkpoint x3     {- x3 = x1 + 20 -}
+  let x4 = x3 + 10
+  return x4
+
+{-
+GHCi> runCheckpointed (< 100) $ addTens 1
+31
+GHCi> runCheckpointed  (< 30) $ addTens 1
+21
+GHCi> runCheckpointed  (< 20) $ addTens 1
+11
+GHCi> runCheckpointed  (< 10) $ addTens 1
+1
+-}
         
