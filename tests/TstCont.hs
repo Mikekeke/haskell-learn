@@ -32,6 +32,16 @@ prodCnt (x:xs) = do
 
 tstProdCont l = runCont (prodCnt l) id
 
+prodCnt2 [] = cont (const 0)
+-- prodCnt2 (0:_) = cont (const 0) 
+-- prodCnt2 (x:[]) = return x
+-- prodCnt2 (x:xs) = do
+--     rest <- prodCnt xs
+--     return $ trace "cont mult" $ x * rest
+prodCnt2 (x:xs) | x == 0 = cont (const 0) 
+                | null xs = return x
+                | otherwise = prodCnt xs >>= return . trace "cont mult" (x*)
+
 {-
 Way to do efficient product with Cont:
 "tstProdCont testl1" should not trace any "cont mult"
