@@ -1,5 +1,6 @@
 import Control.Monad (ap, return)
 import Debug.Trace
+import Control.Monad.Except
 
 -- decode c [x] = x
 -- decode c (x:xs) = foldl (\b x -> if b < x then b*x else x+b) x xs
@@ -88,13 +89,50 @@ addTens x1 = \checkpoint -> do
   return x4
 
 {-
-GHCi> runCheckpointed (< 100) $ addTens 1
+> runCheckpointed (< 100) $ addTens 1
 31
-GHCi> runCheckpointed  (< 30) $ addTens 1
+> runCheckpointed  (< 30) $ addTens 1
 21
-GHCi> runCheckpointed  (< 20) $ addTens 1
+> runCheckpointed  (< 20) $ addTens 1
 11
-GHCi> runCheckpointed  (< 10) $ addTens 1
+> runCheckpointed  (< 10) $ addTens 1
 1
 -}
+
+newtype FailCont r e a = FailCont {runFailCont :: (a -> r) -> (e -> r) -> r}
+data ReadError = EmptyInput deriving Show
+
+
+instance Functor (FailCont r e) where
+    fmap f (FailCont g) = FailCont $ \ ok err -> g (\x -> ok (f x)) err
+-- from solutions
+-- instance Functor (FailCont r e) where fmap = liftM    
+
+instance Applicative (FailCont r e) where
+    pure = return
+    (<*>) = ap
+
+instance Monad (FailCont r e) where
+    return x = FailCont $ \ok _ -> ok x
+    (FailCont g) >>= k = FailCont $ \ok err -> g (\x -> runFailCont (k x) ok err) err
+        
+
+add :: Int -> Int -> FailCont r e Int
+add x y = FailCont $ \ok _ -> ok $ x + y
+
+toFailCont :: Except e a -> FailCont r e a
+toFailCont ex = FailCont $ \ok err -> either err ok (runExcept ex)
+
+evalFailCont :: FailCont (Either a b) a b -> Either a b
+evalFailCont cnt = (runFailCont cnt) Right Left
+
+tryRead :: String -> Except ReadError Int
+tryRead "" = throwError EmptyInput
+tryRead s = return . read $ s
+
+addInts :: String -> String -> FailCont r ReadError Int
+addInts s1 s2 = do
+  i1 <- toFailCont $ tryRead s1
+  i2 <- toFailCont $ tryRead s2
+  return $ i1 + i2
         

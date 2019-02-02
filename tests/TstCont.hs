@@ -50,3 +50,7 @@ unlike "prod", which will still perform 3 multiplications till reach 0
 
 how base does "product" can't understand yet
 -}
+
+prodFold [] = 0
+prodCnt (x:xs) = foldr f 1 (x:xs) where
+     
