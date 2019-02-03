@@ -1,6 +1,7 @@
 import Control.Monad (ap, return)
 import Debug.Trace
 import Control.Monad.Except
+import qualified Control.Monad.Cont as C
 
 -- decode c [x] = x
 -- decode c (x:xs) = foldl (\b x -> if b < x then b*x else x+b) x xs
@@ -35,7 +36,10 @@ showCont m = runCont m show
 -- from answers : showCont = (`runCont` show)
 
 ret :: a -> Cont r a
-ret x = Cont $ \c -> c x 
+ret x = Cont $ \c -> c x
+
+cont :: ((a -> r) -> r) -> Cont r a
+cont = Cont
 
 
 instance Functor (Cont r) where
@@ -136,3 +140,21 @@ addInts s1 s2 = do
   i2 <- toFailCont $ tryRead s2
   return $ i1 + i2
         
+callCFC :: ((a -> FailCont r e b) -> FailCont r e a) -> FailCont r e a
+callCFC f = FailCont $ \ok err -> runFailCont (f $ \a1 -> FailCont $ \_ _ -> ok a1) ok err
+
+callCC :: ((a -> Cont r b) -> Cont r a) -> Cont r a
+callCC f = Cont $ \c -> runCont (f $ \a1 -> Cont $ \_ -> c a1) c
+
+testCC :: Num r => Integer -> Cont r Integer
+testCC x1 = callCC $ \k -> do
+    x2 <- return 10
+    x3 <- cont (\c -> c (x2 + 100))
+    when (x1 > 10) (k (-1))
+    return $ x3
+    
+-- when      :: (Applicative f) => Bool -> f () -> f ()
+-- when p s  = if p then s else pure ()
+testCC2 :: Integer -> Cont r Integer
+--                                                               k :: Integer -> Cont r ()
+testCC2 x1 = callCC $ \k -> return 22 >>= \x2 -> when (x1 > 10) (k 101) >> return (x1 + x2)

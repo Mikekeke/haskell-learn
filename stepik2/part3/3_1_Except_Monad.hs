@@ -1,3 +1,5 @@
+import qualified Control.Monad.Except as EX
+
 newtype Except e a = Except {runExcept :: Either e a }
 
 withExcept :: (e -> e') -> Except e a -> Except e' a
@@ -104,4 +106,55 @@ if 3 == 1 then 11 else id (3 - 1))
 id 2
 2
 
+to clarify - END -}
+
+data ReadError = EmptyInput | NoParse String deriving Show
+tryRead :: Read a => String -> Except ReadError a
+tryRead "" = Except $ Left EmptyInput
+tryRead s = Except $ case reads s of
+    [(v,[])] -> Right v
+    _ -> Left . NoParse $ s
+
+{- solutions
+import Text.Read
+
+tryRead :: Read a => String -> Except ReadError a
+tryRead "" = throwE EmptyInput
+tryRead x = (except $ readEither x) `catchE` (\_ -> throwE $ NoParse x)
+
+*************************
+import           Control.Monad.Except
+
+tryRead :: Read a => String -> Except ReadError a
+tryRead []                   = throwError EmptyInput
+tryRead s = case reads s of
+  (x, []): _ -> return x
+  _         -> throwError $ NoParse s
+
+-}
+
+tryRead' :: Read a => String -> EX.Except ReadError a
+tryRead' []                   = EX.throwError EmptyInput
+tryRead' s = case reads s of
+  (x, []): _ -> EX.return x
+  _         -> EX.throwError $ NoParse s
+
+
+data SumError = SumError Int ReadError
+  deriving Show
+
+trySum :: [String] -> EX.Except SumError Integer
+trySum [] = return 0
+trySum s = (fmap sum) . mapM readWithIdx . zip [1..] $ s where
+    readWithIdx (i,v) = EX.withExcept (SumError i) (tryRead' v)
+
+{- interesting from solutions
+import Control.Monad
+
+trySum :: [String] -> Except SumError Integer
+trySum = (sum <$>) . zipWithM ((. tryRead) . withExcept . SumError) [1..]
+
+stuffs:
+trySum :: [String] -> Except SumError Integer
+trySum xs = sum <$> traverse (\(i, s) -> withExcept (SumError i) $ tryRead s) (zip [1..] xs)
 -}

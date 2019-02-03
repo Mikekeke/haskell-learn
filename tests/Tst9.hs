@@ -60,3 +60,9 @@ grpByReq _ l = [l]
 cnctReq :: [[a]] -> [a]
 cnctReq [] = []
 cnctReq (ys:xss) = foldr (:) (cnctReq xss) ys
+
+tst :: Int -> Maybe Int
+tst x = do
+    a <- return 3
+    guard (x > 3)
+    return $ a + x
