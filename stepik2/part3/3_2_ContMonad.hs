@@ -146,6 +146,9 @@ callCFC f = FailCont $ \ok err -> runFailCont (f $ \a1 -> FailCont $ \_ _ -> ok 
 callCC :: ((a -> Cont r b) -> Cont r a) -> Cont r a
 callCC f = Cont $ \c -> runCont (f $ \a1 -> Cont $ \_ -> c a1) c
 
+callCC' :: ((a -> (b -> r) -> r) -> (a -> r) -> r) -> (a -> r) -> r
+callCC' f = \c -> f (\a1 _ -> c a1) c
+
 testCC :: Num r => Integer -> Cont r Integer
 testCC x1 = callCC $ \k -> do
     x2 <- return 10
@@ -158,3 +161,7 @@ testCC x1 = callCC $ \k -> do
 testCC2 :: Integer -> Cont r Integer
 --                                                               k :: Integer -> Cont r ()
 testCC2 x1 = callCC $ \k -> return 22 >>= \x2 -> when (x1 > 10) (k 101) >> return (x1 + x2)
+
+-- ??????????????????
+dd f = f (\a1 -> "lol " ++ show a1)
+dd1 x = dd $ \fun -> if x > 10 then "ok" else fun x
