@@ -120,12 +120,17 @@ mkEndo = foldr (mappend . Endo) (Endo id)
 
 infixr 9 |.|
 newtype (|.|) f g a = Cmps { getCmps :: f (g a) }  deriving (Eq,Show)
+
 -- length :: Foldable t => t a -> Int
+-- length = getSum . foldMap (Sum . const  1)
+-- length = foldl' (\c _ -> c+1) 0
 -- length $ Cmps [[1,2], [], [3,4,5,6,7]] = 7
+
 instance (Foldable f, Foldable g) => Foldable (f |.| g) where
     foldMap fn = foldMap (foldMap fn) . getCmps
     -- or
-    -- foldr f ini = foldr (\ga b -> foldr f b ga) ini . getCmps 
+    -- foldr f ini = foldr (\ga b -> foldr f b ga) ini . getCmps
+    -- uses result of fold of firts inner cont as ini for fold of next inner cont
     -- shorter 
     foldr f ini = foldr (flip $ foldr f) ini . getCmps
     
