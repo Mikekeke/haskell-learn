@@ -120,6 +120,7 @@ mkEndo = foldr (mappend . Endo) (Endo id)
 
 infixr 9 |.|
 newtype (|.|) f g a = Cmps { getCmps :: f (g a) }  deriving (Eq,Show)
+-- length :: Foldable t => t a -> Int
 -- length $ Cmps [[1,2], [], [3,4,5,6,7]] = 7
 instance (Foldable f, Foldable g) => Foldable (f |.| g) where
     foldMap fn = foldMap (foldMap fn) . getCmps
