@@ -163,5 +163,13 @@ testCC2 :: Integer -> Cont r Integer
 testCC2 x1 = callCC $ \k -> return 22 >>= \x2 -> when (x1 > 10) (k 101) >> return (x1 + x2)
 
 -- ??????????????????
-dd f = f (\a1 -> "lol " ++ show a1)
-dd1 x = dd $ \fun -> if x > 10 then "ok" else fun x
+-- f :: (a -> [Char]) -> t
+g f = f (\a1 -> "err: " ++ show a1)
+h x = g $ \fun -> if x > 10 then "ok" else fun x
+
+handle x = "err: " ++ show x
+g' f = ff where
+    ff =  f handle
+
+h' x = g $ f' where 
+    f' = \fun -> if x > 10 then "ok" else fun x
