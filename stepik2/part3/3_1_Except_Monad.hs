@@ -1,4 +1,6 @@
 import qualified Control.Monad.Except as EX
+import Data.Semigroup
+import Data.Monoid
 
 newtype Except e a = Except {runExcept :: Either e a }
 
@@ -87,7 +89,7 @@ fff2 = foldr (\x f y -> if y == 1 then x else f (y - 1)) id [10..11]
 fn = \x f y -> if y == 1 then x else f (y - 1)
 fn 10 (fn 11 id)
 fn 10 (\y -> if y == 1 then 11 else id (y - 1))
-\y1 -> if y == 1 then 10 else f (\y -> if y == 1 then 11 else id (y - 1)) (y1 - 1)
+\y1 -> if y == 1 then 10 else (\y -> if y == 1 then 11 else id (y - 1)) (y1 - 1)
 
 y1 = 1
 if 1 == 1 then 10 else (\y -> if y == 1 then 11 else id (y - 1)) (y1 - 1)
@@ -158,3 +160,21 @@ stuffs:
 trySum :: [String] -> Except SumError Integer
 trySum xs = sum <$> traverse (\(i, s) -> withExcept (SumError i) $ tryRead s) (zip [1..] xs)
 -}
+
+newtype SimpleError = Simple { getSimple :: String } 
+  deriving (Eq, Show)
+
+instance Semigroup SimpleError where
+  (<>) = mappend
+
+instance Monoid SimpleError where
+  mempty = Simple ""
+  Simple a `mappend` Simple b = Simple $ a ++ b
+
+
+lie2se :: ListIndexError -> SimpleError
+lie2se (ErrIndexTooLarge i) = Simple $ "[index (" ++ show i ++ ") is too large]"
+lie2se ErrNegativeIndex = Simple "[negative index]"
+
+toSimple = runExcept . withExcept lie2se
+xs = [1,2,3]
