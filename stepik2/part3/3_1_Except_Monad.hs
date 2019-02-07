@@ -146,7 +146,6 @@ data SumError = SumError Int ReadError
   deriving Show
 
 trySum :: [String] -> EX.Except SumError Integer
-trySum [] = return 0
 trySum s = (fmap sum) . mapM readWithIdx . zip [1..] $ s where
     readWithIdx (i,v) = EX.withExcept (SumError i) (tryRead' v)
 
@@ -160,21 +159,3 @@ stuffs:
 trySum :: [String] -> Except SumError Integer
 trySum xs = sum <$> traverse (\(i, s) -> withExcept (SumError i) $ tryRead s) (zip [1..] xs)
 -}
-
-newtype SimpleError = Simple { getSimple :: String } 
-  deriving (Eq, Show)
-
-instance Semigroup SimpleError where
-  (<>) = mappend
-
-instance Monoid SimpleError where
-  mempty = Simple ""
-  Simple a `mappend` Simple b = Simple $ a ++ b
-
-
-lie2se :: ListIndexError -> SimpleError
-lie2se (ErrIndexTooLarge i) = Simple $ "[index (" ++ show i ++ ") is too large]"
-lie2se ErrNegativeIndex = Simple "[negative index]"
-
-toSimple = runExcept . withExcept lie2se
-xs = [1,2,3]
