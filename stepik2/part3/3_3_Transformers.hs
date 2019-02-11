@@ -30,6 +30,7 @@ separate' p1 p2 (x:xs) = do
         True -> ys
         False -> x : ys
 
+-- **********************************************
 {-
 λ: :t or
 or :: Foldable t => t Bool -> Bool
@@ -84,3 +85,45 @@ instance Applicative ((->) t) where
 -}
 ff :: Num a => (a -> [a]) -> a -> [a]
 ff v = (:) <$> (\x -> x + 2) <*> v
+-- **********************************************
+
+
+type MyRW = ReaderT [String] (Writer String)
+logFirstAndRetSecond' :: MyRW String
+logFirstAndRetSecond' = do
+  el1 <- myAsks head
+  el2 <- myAsks (map toUpper . head . tail)
+  myTell el1
+  return el2
+
+myAsks :: ([String] -> a) -> MyRW a
+myAsks = asks
+
+myTell :: String -> MyRW ()
+myTell = lift . tell
+
+-- *****************************************
+
+type MyRWT m = ReaderT [String] (WriterT String m)
+
+runMyRWT :: MyRWT m a -> [String] -> m (a, String)
+runMyRWT rwt s = runWriterT (runReaderT rwt s)
+-- runMyRWT = (runWriterT .). runReaderT
+
+myAsks' :: Monad m => (r -> a) -> ReaderT r m a
+myAsks' = asks
+
+myTell' :: Monad m => String -> ReaderT [String] (WriterT String m) ()
+myTell' = lift . tell
+
+myLift :: Monad m => m a -> ReaderT [String] (WriterT String m) a
+myLift = lift . lift
+
+logFirstAndRetSecond'' :: MyRWT IO String
+logFirstAndRetSecond'' = do
+  el1 <- myAsks' head
+  myLift $ putStrLn $ "First is " ++ show el1
+  el2 <- myAsks' (map toUpper . head . tail)
+  myLift $ putStrLn $ "Second is " ++ show el2
+  myTell' el1
+  return el2
