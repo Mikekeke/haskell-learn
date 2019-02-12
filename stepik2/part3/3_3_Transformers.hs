@@ -3,6 +3,8 @@ import Control.Monad.Trans.Reader
 import Control.Monad.Trans.Class
 import Data.Char
 import Control.Monad
+import Data.List
+import Data.Bifunctor
 
 strings = ["abc", "defg", "hij"]
 logFirstAndRetSecond :: WriterT String (Reader [String]) String
@@ -143,4 +145,55 @@ logFirstAndRetSecondSafe = do
     _ -> myLift Nothing
 
 veryComplexComputation :: MyRWT Maybe (String, String)
-veryComplexComputation = undefined
+veryComplexComputation = do
+    (odds, evens) <- myAsks' (partition (odd.length))
+    case (odds, evens) of
+        (o1:o2:_, e1:e2:_) -> do
+            myTell' $ e1 ++ ","
+            myTell' o1 
+            return $ join bimap (map toUpper) (e2, o2)
+        _ -> myLift Nothing
+
+-- bertter after seing solutions (but could grasp myself, doh)
+veryComplexComputation' :: MyRWT Maybe (String, String)
+veryComplexComputation' = do
+    (o1:o2:_, e1:e2:_) <- myAsks' (partition (odd.length))
+    myTell' $ e1 ++ "," ++ o1 
+    return $ join bimap (map toUpper) (e2, o2) -- see BimapJoin.hs
+
+{- from solutions
+magic arrow stuff
+
+import Control.Arrow
+
+veryComplexComputation :: MyRWT Maybe (String, String)
+veryComplexComputation = do
+    (e1 : e2 : _, o1 : o2 : _) <- myAsks $ filter (even . length) &&& filter (odd . length)
+    myTell $ e1 ++ "," ++ o1
+    return $ (map toUpper e2, map toUpper o2)
+**********************************
+
+stuffs solution (like using "local")
+
+veryComplexComputation :: MyRWT Maybe (String, String)
+veryComplexComputation = do
+  s1 <- myWithReader (filter $ even . length) logFirstAndRetSecond
+  myTell ","
+  s2 <- myWithReader (filter $ odd  . length) logFirstAndRetSecond
+  return (s1, s2)
+
+myWithReader :: Monad m => ([String] -> [String]) -> MyRWT m a -> MyRWT m a
+myWithReader = withReaderT
+
+-}
+
+-- GHCi> runMyRWT veryComplexComputation ["abc","defg","hij"]
+-- Nothing
+-- GHCi> runMyRWT veryComplexComputation ["abc","defg","hij","kl"]
+-- Just (("KL","HIJ"),"defg,abc")
+
+
+
+
+
+
