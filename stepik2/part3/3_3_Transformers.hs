@@ -99,6 +99,8 @@ logFirstAndRetSecond' = do
 myAsks :: ([String] -> a) -> MyRW a
 myAsks = asks
 
+myAsk = myAsks id
+
 myTell :: String -> MyRW ()
 myTell = lift . tell
 
@@ -112,6 +114,10 @@ runMyRWT rwt s = runWriterT (runReaderT rwt s)
 
 myAsks' :: Monad m => (r -> a) -> ReaderT r m a
 myAsks' = asks
+
+myAsk' = myAsks' id
+
+
 
 myTell' :: Monad m => String -> ReaderT [String] (WriterT String m) ()
 myTell' = lift . tell
@@ -127,3 +133,14 @@ logFirstAndRetSecond'' = do
   myLift $ putStrLn $ "Second is " ++ show el2
   myTell' el1
   return el2
+
+
+logFirstAndRetSecondSafe :: MyRWT Maybe String
+logFirstAndRetSecondSafe = do
+  xs <- myAsk'
+  case xs of
+    (el1 : el2 : _) -> myTell' el1 >> return (map toUpper el2)
+    _ -> myLift Nothing
+
+veryComplexComputation :: MyRWT Maybe (String, String)
+veryComplexComputation = undefined
