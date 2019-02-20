@@ -172,4 +172,11 @@ g' f = ff where
     ff =  f handle
 
 h' x = g $ f' where 
+ -- f' :: (a -> [Char]) -> [Char]
     f' = \fun -> if x > 10 then "ok" else fun x
+
+-- some thoughts
+k :: Num t1 => (t1 -> t2) -> t2
+k f = f 3
+k2 :: Show a => ((a -> String) -> t) -> t
+k2 f = f (\a1 -> show a1)

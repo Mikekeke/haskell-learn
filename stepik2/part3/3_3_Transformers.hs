@@ -57,6 +57,8 @@ separate p1 p2 = fmap catMaybes. mapM analyze where
       when (p2 x) $ lift $ tell [x]
       return$ mfilter (not.or.sequenceA[p1,p2]) $ Just x
 
+!to-understand
+sequenceA == traverse id
 traverse id [(\x -> x + 2)]
 foldr (\a b -> (:) <$> id a <*> b) (pure []) [(\x -> x + 2)]
 
@@ -65,7 +67,11 @@ foldr (\a b -> (:) <$> id a <*> b) (pure []) [(\x -> x + 2)]
 (:) <$> id (\x -> x + 2) <*> (pure [])
 (:) <$> (\x -> x + 2) <*> (pure [])
 (:) . (\x -> x + 2) <*> (pure [])
-(:) . (\x -> x + 2) <*> (\ -> [])
+(:) . (\x -> x + 2) <*> (\_-> [])
+((:) . (\x -> x + 2) <*> (\_-> [])) :: Num a => a -> [a]
+
+λ: ((:) . (\x -> x + 2) <*> (\_-> [])) 2
+[4]
 
 *******
 instance Applicative ((->) t) where
