@@ -23,13 +23,12 @@ testRunner = Runner {
 initRank runner = RunnerRank (rID testRunner) 0
 testState = (testRunner, testTrack, initRank testRunner)
 
-tickMoveset rnr | (m:ms) <- moveSet rnr = Right (m,ms)
-                | otherwise = Left "Runner no moves"
-    
+tickLstWthErr :: String -> (a -> [b]) -> a -> Either String (b, [b])
+tickLstWthErr err getter obj | (m:ms) <- getter obj = Right (m,ms)
+                             | otherwise = Left err
 
-tickTrack tr = case tr of
-    [] -> Left "Track ended"
-    t:ts -> Right (t,ts)
+tickMoveSet  = tickLstWthErr "Runner no moves" moveSet
+tickTrack = tickLstWthErr "Track ended" id
 
 canPass :: Move -> Tile -> Bool 
 canPass Run Flat = True
@@ -51,13 +50,13 @@ trackEnded = null
 -- todo: better validated here
 tickRunner rnr = do
     when (energy rnr == 0) (Left "Runner no energy")
-    (_, nextMs) <-  tickMoveset rnr
+    (_, nextMs) <-  tickMoveSet rnr
     return $ rnr {energy = pred (energy rnr), moveSet = nextMs}
 
 upRank rnk = rnk {rank = succ $ rank rnk}
 
 tryTrack rnr tr = do
-    (nextM, _) <- tickMoveset rnr
+    (nextM, _) <- tickMoveSet rnr
     (nextT, _) <- tickTrack tr
     let nextTrack = if canPass nextM nextT then tail tr else tr
     return nextTrack
