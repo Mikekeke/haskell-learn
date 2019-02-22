@@ -17,15 +17,15 @@ type RunState = (Runner, [Tile], RunnerRank)
 testTrack = [Flat, Flat, Peak, Rock, Flat]
 testRunner = Runner {
     rID = "r1"
-    , energy = 6
+    , energy = 10
     , moveSet = [Run, Run, Run, Run, Run, Run, Run, Run]
 }
 initRank runner = RunnerRank (rID testRunner) 0
 testState = (testRunner, testTrack, initRank testRunner)
 
-tickMoveset rnr = case moveSet rnr of
-    [] -> Left "Runner no moves"
-    m:ms -> Right (m,ms)
+tickMoveset rnr | (m:ms) <- moveSet rnr = Right (m,ms)
+                | otherwise = Left "Runner no moves"
+    
 
 tickTrack tr = case tr of
     [] -> Left "Track ended"
