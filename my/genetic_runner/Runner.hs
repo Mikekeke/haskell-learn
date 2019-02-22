@@ -1,11 +1,12 @@
 import Control.Monad.State
 import Data.List
 import Control.Monad.Except
+import Control.Monad
 
-data Tile = Flat | Rock | Peak
-data Move = Run | Jump | DoubleJump
-data Runner = Runner {rID :: String, energy :: Int, moveSet :: [Move]}
-data RunnerRank = RunnerRank {runnerId :: String, rank :: Int}
+data Tile = Flat | Rock | Peak deriving Show
+data Move = Run | Jump | DoubleJump deriving Show
+data Runner = Runner {rID :: String, energy :: Int, moveSet :: [Move]} deriving Show
+data RunnerRank = RunnerRank {runnerId :: String, rank :: Int} deriving Show
 
 testTrack = [Flat, Flat, Peak, Rock, Flat]
 testRunner = Runner {
@@ -13,21 +14,25 @@ testRunner = Runner {
     , energy = 6
     , moveSet = [Run, Run, DoubleJump, Jump, Run]
 }
+initRank runner = RunnerRank (rID testRunner) 0
+testState = (testRunner, testTrack, initRank testRunner)
 
-canRun runner | energy runner == 0 = False
-              | otherwise = True
+runnerDone runner | energy runner == 0 = True
+                  | otherwise = False
 
-trackEnded :: [Move] -> Bool
+trackEnded :: [Tile] -> Bool
 trackEnded = null
 
-type RunApp = ExceptT String (State (Runner, [Move], RunnerRank)) ()
-makeMove :: RunApp
+changeState (runner, track, currentRank) = (
+    runner {energy = (pred $ energy runner), moveSet = tail (moveSet runner)}
+    , tail track
+    , currentRank {rank = succ $ rank currentRank} )
+
+type RunnerApp = ExceptT String (State (Runner, [Tile], RunnerRank)) ()
+makeMove :: RunnerApp
 makeMove = do
     (runner, track, rank) <- get
-    return undefined
+    when (trackEnded track) (throwError "Track ended")
+    when (runnerDone runner) (throwError "Runner done")
+    modify changeState
 
-
-attempt :: State (Runner, [Move], RunnerRank) () 
-attempt = do
-    (runner, track, rank) <- get
-    return undefined
