@@ -27,10 +27,6 @@ tickMoveset rnr = case moveSet rnr of
     [] -> Left "Runner no moves"
     m:ms -> Right (m,ms)
 
-tickEnergy rnr = let nxt = pred (energy rnr) in case nxt of
-    0 -> Left "Runner no energy"
-    x -> Right x
-
 tickTrack tr = case tr of
     [] -> Left "Track ended"
     t:ts -> Right (t,ts)
@@ -54,9 +50,9 @@ trackEnded = null
 
 -- todo: better validated here
 tickRunner rnr = do
-    nextEnrg <- tickEnergy rnr
+    when (energy rnr == 0) (Left "Runner no energy")
     (_, nextMs) <-  tickMoveset rnr
-    return $ rnr {energy = nextEnrg, moveSet = nextMs}
+    return $ rnr {energy = pred (energy rnr), moveSet = nextMs}
 
 upRank rnk = rnk {rank = succ $ rank rnk}
 
