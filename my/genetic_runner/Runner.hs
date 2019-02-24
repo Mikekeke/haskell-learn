@@ -6,29 +6,42 @@ import Control.Monad.State
 import Control.Monad.Except
 import Data.Maybe
 import Control.Applicative
+import System.Random
 
+{- types and data -}
 data Tile = Flat | Rock | Peak deriving Show
 type Track = [Tile]
 data Move = Run | Jump | DoubleJump deriving Show
-data Runner = Runner {rID :: String, energy :: Int, moveSet :: [Move]} deriving Show
+data Runner = Runner {energy :: Int, moveSet :: [Move]} deriving Show
 data RunnerRank = RunnerRank {runnerId :: String, rank :: Int} deriving Show
-type RunState = (Runner, [Tile], RunnerRank)
+type RunState = (Track, Runner)
+data RunResult = NoMovesLeft | NoEnergyLeft | TrackEnded | NoEnergyTo Move deriving Show
+newtype RunnerApp a = RunnerApp {unApp :: ExceptT RunResult (State RunState) a} 
+    deriving (Functor, Applicative, Monad, MonadState RunState, MonadError RunResult)
 
-testTrack = [Flat, Flat, Peak, Rock, Flat]
-testRunner = Runner {
-    rID = "r1"
-    , energy = 10
-    , moveSet = [Run, Run, Run, Run, Run, Run, Run, Run]
-}
-initRank runner = RunnerRank (rID testRunner) 0
-testState = (testRunner, testTrack, initRank testRunner)
+runApp :: RunnerApp a -> RunState -> (Either RunResult a, RunState)
+runApp = runState . runExceptT . unApp
 
-tickLstWthErr :: String -> (a -> [b]) -> a -> Either String (b, [b])
-tickLstWthErr err getter obj | (m:ms) <- getter obj = Right (m,ms)
-                             | otherwise = Left err
+{- execution step related -}
+tickLstWthErr :: RunResult -> (a -> [b]) -> a -> RunnerApp (b, [b])
+tickLstWthErr err getter obj | (m:ms) <- getter obj = return (m,ms)
+                             | otherwise = throwError err
+tickMoveSet ::Runner -> RunnerApp (Move, [Move])
+tickMoveSet  = tickLstWthErr NoMovesLeft moveSet
+tickTrack :: Track -> RunnerApp (Tile, Track)
+tickTrack = tickLstWthErr TrackEnded id
 
-tickMoveSet  = tickLstWthErr "Runner no moves" moveSet
-tickTrack = tickLstWthErr "Track ended" id
+requiredEnergy Run        = 1
+requiredEnergy Jump       = 2
+requiredEnergy DoubleJump = 3
+
+tickRunner :: Runner -> RunnerApp (Move, Runner)
+tickRunner rnr = do
+    (currMv, nextMs) <- tickMoveSet rnr
+    let newEnergy = energy rnr - requiredEnergy currMv
+    when (newEnergy < 0) (throwError $ NoEnergyTo currMv)
+    return $ (currMv, rnr {energy = newEnergy, moveSet = nextMs})
+
 
 canPass :: Move -> Tile -> Bool 
 canPass Run Flat = True
@@ -36,41 +49,52 @@ canPass Jump Rock = True
 canPass DoubleJump Peak = True
 canPass _ _ = False
 
-trackEnded :: [Tile] -> Bool
+trackEnded :: Track -> Bool
 trackEnded = null
 
--- makeStep rnr tr = do
---     nextEnrg <- tickEnergy rnr
---     (nextM, nextMs) <-  tickMoveset rnr
---     (nextT, restT) <- tickTrack tr
---     let nextTrack = if canPass nextM nextT then restT else tr
---     return (rnr {energy = nextEnrg, moveSet = nextMs}, nextTrack)
-
-
--- todo: better validated here
-tickRunner rnr = do
-    when (energy rnr == 0) (Left "Runner no energy")
-    (_, nextMs) <-  tickMoveSet rnr
-    return $ rnr {energy = pred (energy rnr), moveSet = nextMs}
-
-upRank rnk = rnk {rank = succ $ rank rnk}
-
-tryTrack rnr tr = do
-    (nextM, _) <- tickMoveSet rnr
+tryTrack :: Track -> Move -> RunnerApp Track
+tryTrack tr move = do
     (nextT, _) <- tickTrack tr
-    let nextTrack = if canPass nextM nextT then tail tr else tr
+    let nextTrack = if canPass move nextT then tail tr else tr
     return nextTrack
 
-changeState (runner, track, rnk) = liftA3 (,,) (tickRunner runner) (tryTrack runner track) (pure $ upRank rnk)
+makeMove ::  RunnerApp ()
+makeMove = do
+    (tr, rnr) <- get
+    (currMv, nextRnr) <- tickRunner rnr
+    nextTr <- tryTrack tr currMv
+    put (nextTr, nextRnr)
 
-newtype RunnerApp a = RunnerApp {unApp :: ExceptT String (State (Runner, Track, RunnerRank)) a} 
-    deriving (Functor, Applicative, Monad, MonadState RunState, MonadError String)
-runApp = runState . runExceptT . unApp
+{- experiment data generating -}
+genMoveSet :: IO [Move]
+genMoveSet = do
+    mvsN <- randomRIO (6,20)
+    mvsIds <- (replicateM mvsN $ randomRIO (1,3) :: IO [Int])
+    return $ map pickMove mvsIds
 
-makeMove :: RunnerApp ()
-makeMove = get >>= either throwError put . changeState
+genEnergy :: IO Int
+genEnergy = randomRIO (6,30)
 
-test1 = runApp (forever makeMove) testState
-test2 = runApp (replicateM 4 makeMove) testState
+genRunner :: IO Runner
+genRunner = liftA2 Runner genEnergy genMoveSet
 
+pickMove 1 = Run
+pickMove 2 = Jump
+pickMove 3 = DoubleJump
+
+{- experiment logic -}
+
+-- runTrack :: Track -> Runner -> (Either RunResult (), RunState)
+runTrack tr rnr = runApp (forever makeMove) (tr, rnr)
+
+testTrack = [Flat, Flat, Peak, Rock, Flat, Rock]
+
+runTestTrack :: Runner -> (Either RunResult (), RunState)
+runTestTrack = runTrack testTrack
+
+
+main :: IO ()
+main = do
+    runners <- replicateM 20 genRunner
+    mapM_ (putStrLn . show . ap (,) runTestTrack) runners
 
