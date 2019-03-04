@@ -72,10 +72,11 @@ fn 10 (foldr fn show [11])
 fn 10 (fn 11 (foldr fn [] show))
 fn 10 (fn 11 (show))
 fn 10 (fn 11 show)
-fn 10 (\11 show -> \y -> if y == 1 then ...)
+fn 10 (\11 show -> \y -> if y == 1 then f x else f (y - 1))
 fn 10 (\y -> if y == 1 then show 11 else show (y - 1))
-\10 (\y -> if y == 1 then show 11 else show (y - 1)) -> y1 -> if y1 == 1 then ...
--- show swapped to this ^^^ lambda
+\10 (\y -> if y == 1 then show 11 else show (y - 1)) ->
+    \y1 -> if y1 == 1 then f x else f (y - 1)
+-- "show" swapped to "\y -> ..." lambda
 y1 -> if y1 == 1 then (\y -> if y == 1 then show 11 else show (y - 1)) 10 else (\y -> if y == 1 then show 11 else show (y - 1)) (y - 1))
 y1 = 1
 ~> (\y -> if y == 1 then show 11 else show (y - 1)) 10
