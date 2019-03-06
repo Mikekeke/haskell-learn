@@ -25,3 +25,15 @@ test2 = do
 
 ss = ["1", "2", "3"]
 tstTrs1 = (==) <$> runReaderT test1 <*> runReaderT test2 -- for ss is True
+
+tst3 :: Monad m => ReaderT String (WriterT String m) String
+tst3 = do
+    x <- ask
+    tell $ "one " ++ show x
+    tell $ "two " ++ show x
+    return x
+
+{-
+λ: runWriterT $ runReaderT ((show . length) <$> tst3) "test" :: Maybe (String, String)
+Just ("4","one \"test\"two \"test\"")
+-}
