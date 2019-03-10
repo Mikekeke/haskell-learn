@@ -73,5 +73,19 @@ runTest4_2' ::  Maybe (Either String Int, String)
 runTest4_2' = runTest4' False -- Nothing
 runTest4_4' ::  Either String (Either String Int, String)
 runTest4_4' = runTest4' False -- *** Exception: Base monad fail
- 
+
+-- ************************************************
+
+t5f1 = Right 1
+t5f2 :: Int -> Except String Int
+t5f2 x = throwError $ "test5: " ++ show x
+
+fromEx :: Monad m => Except e a -> ExceptT e m a
+fromEx = ExceptT . return . runExcept
+
+test5 :: ExceptT String (Either String) Int
+test5 = do
+    x1 <- lift t5f1
+    fromEx $ t5f2 x1
+    undefined
 
