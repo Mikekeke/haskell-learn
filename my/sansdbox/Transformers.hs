@@ -76,16 +76,18 @@ runTest4_4' = runTest4' False -- *** Exception: Base monad fail
 
 -- ************************************************
 
-t5f1 = Right 1
 t5f2 :: Int -> Except String Int
 t5f2 x = throwError $ "test5: " ++ show x
 
 fromEx :: Monad m => Except e a -> ExceptT e m a
 fromEx = ExceptT . return . runExcept
 
-test5 :: ExceptT String (Either String) Int
+test5 :: Monad m => ExceptT String m Int
 test5 = do
-    x1 <- lift t5f1
-    fromEx $ t5f2 x1
-    undefined
+    fromEx $ t5f2 666
+    return 1
+{-
+λ: runExceptT test5 :: Maybe (Either String Int)
+Just (Left "test5: 666")
+-}
 
