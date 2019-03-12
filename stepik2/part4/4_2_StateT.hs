@@ -101,7 +101,7 @@ go' (Fork l () r) = p1 <*> pick <*> go' r
                     p1 = Fork <$> go' l
 
 fnn :: Integer -> (Integer, Integer)
-fnn = ((,) <$> id <*> (+1)) -- fnn 2 => (2,3)ff 
+fnn = ((,) <$> id <*> (+1)) -- fnn 2 => (2,3)
 
 just to campare and not forget:
 λ: (+10) >>= (,) $ 1
