@@ -5,6 +5,7 @@ class Monoid1 a where
 instance Monoid1 b => Monoid1 (a -> b) where
     memptyest _ = memptyest
     mappendy f g x = f x `mappendy` g x
+    -- mappendy f g = \x -> f x `mappendy` g x
 
 -- λ: import Data.Monoid
 -- λ: :t [(+2), (*10)]

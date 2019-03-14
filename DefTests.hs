@@ -9,6 +9,7 @@ import Control.Monad.Except hiding (fix)
 import Control.Monad.State hiding (fix)
 import Control.Monad.Reader hiding (fix)
 import Control.Exception as Ex
+import Control.Applicative
 
 type Entry = ([Char], ([Char], [Integer]))
 -- ex :: [Entry]
@@ -109,6 +110,18 @@ tst2 = do
     
 -- ["ok rd: ok","err rd: before read"]
 
-    
-        
+trav :: Applicative f => (a -> f b) -> [a] -> f [b]
+trav _ [] = pure []  
+trav k (x:xs) = (:) <$> k x <*> trav k xs 
+
+seqs :: Applicative f => [f a] -> f [a]
+seqs [] = pure []
+seqs (x:xs) = (:) <$> x <*> seqs xs
+
+seqs' :: Applicative f => [f a] -> f [a]
+seqs' = traverse id
+
+trav' :: Applicative f => (a -> f b) -> [a] -> f [b]
+trav' k' l = foldr (\a b -> (:) <$> k' a <*> b) (pure []) l
+trav' k' l = foldr (liftA2 (:) . k') (pure []) l
 
