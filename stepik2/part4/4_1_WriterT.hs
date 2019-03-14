@@ -31,7 +31,7 @@ instance MonadTrans LoggT where
     --     v <- m
     --     return $ Logged "" v
     lift m = LoggT $ m >>= return . Logged ""
--- !!! lift = LoggT . fmap (Logged "")
+-- !!! lift = LoggT . fmap (Logged "") -- put effect inside
 
 logTst :: LoggT Identity Integer
 logTst = do 
