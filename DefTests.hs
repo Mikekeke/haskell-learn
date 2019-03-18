@@ -10,6 +10,8 @@ import Control.Monad.State hiding (fix)
 import Control.Monad.Reader hiding (fix)
 import Control.Exception as Ex
 import Control.Applicative
+import Data.Monoid
+import Debug.Trace
 
 type Entry = ([Char], ([Char], [Integer]))
 -- ex :: [Entry]
@@ -123,5 +125,14 @@ seqs' = traverse id
 
 trav' :: Applicative f => (a -> f b) -> [a] -> f [b]
 trav' k' l = foldr (\a b -> (:) <$> k' a <*> b) (pure []) l
-trav' k' l = foldr (liftA2 (:) . k') (pure []) l
+-- trav' k' l = foldr (liftA2 (:) . k') (pure []) l
+
+
+tst3 m = foldMap m $ [(Just "1"),  undefined,  traceShowId (Just "2")]
+ff 1 = "1"
+ff undefined = "2"
+{-
+λ: ff 3
+"2"
+-}
 
