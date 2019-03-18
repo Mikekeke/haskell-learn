@@ -85,21 +85,28 @@ logSt' = do
   put 42                        -- no lift!
   return $ a * 100
 
-
-instance MonadReader r m => MonadReader r (LoggT m) where
-  ask    = lift ask
-  local fn lrm  = reader $ \r -> undefined 
-  reader = lift . reader
-
+-- hint from cource stuff
 mapLoggT :: (m (Logged a) -> n (Logged b)) -> LoggT m a -> LoggT n b
 mapLoggT f = LoggT . f . runLoggT
 
+-- done by bruteforce
+instance MonadReader r m => MonadReader r (LoggT m) where
+  ask    = lift ask
+--   local fn lrm  = mapLoggT (local fn) lrm
+  local fn lrm  = let g = local fn in mapLoggT g lrm
+--   local = mapLoggT . local
+  reader = lift . reader
+-- from solutions: local f (LoggT ma) = LoggT $ local f ma
+
+{-
 logRdr :: LoggT (Reader [(Int,String)]) ()      
 logRdr = do 
-  m <- asks $ lookup 2                      -- no lift!
-  write2log $ maybe "kek" id m
-  -- Just y <- local ((3,"Jim"):) $ asks $ lookup 3 -- no lift!
-  -- write2log y
+  Just x <- asks $ lookup 2                      -- no lift!
+  write2log x
+  Just y <- local ((3,"Jim"):) $ asks $ lookup 3 -- no lift!
+  write2log y
 
-lcl ::  (r -> r) -> Reader r a -> Reader r a
-lcl f rm = reader $ \r -> runReader rm (f r)  
+GHCi> runReader (runLoggT logRdr) [(1,"John"),(2,"Jane")]
+Logged "JaneJim" ()
+-}
+  
