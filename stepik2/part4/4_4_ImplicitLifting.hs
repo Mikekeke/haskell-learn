@@ -109,4 +109,68 @@ logRdr = do
 GHCi> runReader (runLoggT logRdr) [(1,"John"),(2,"Jane")]
 Logged "JaneJim" ()
 -}
-  
+
+-- ***********************************************************
+class Monad m => MonadLogg m where
+    w2log :: String -> m ()
+    logg :: Logged a -> m a
+
+instance Monad m => MonadLogg (LoggT m) where
+  w2log = write2log
+--   logg (Logged s a) = w2log s >> return a -- my
+  logg = LoggT . return
+
+logSt'' :: LoggT (State Integer) Integer      
+logSt'' = do 
+  x <- logg $ Logged "BEGIN " 1
+  modify (+x)
+  a <- get
+  w2log $ show $ a * 10
+  put 42
+  w2log " END"
+  return $ a * 100
+{-
+λ: runState (runLoggT logSt'') 2
+(Logged "BEGIN 30 END" 300,42)
+-}
+
+instance MonadLogg m => MonadLogg (StateT s m) where
+  w2log = lift . w2log
+  logg  = lift . logg
+
+instance MonadLogg m => MonadLogg (ReaderT r m) where
+  w2log = lift . w2log
+  logg  = lift . logg
+
+rdrStLog :: ReaderT Integer (StateT Integer Logg) Integer      
+rdrStLog = do 
+  x <- logg $ Logged "BEGIN " 1
+  y <- ask
+  modify (+ (x+y))
+  a <- get
+  w2log $ show $ a * 10
+  put 42
+  w2log " END"
+  return $ a * 100
+
+{-
+λ: runLogg $ runStateT (runReaderT rdrStLog 4) 2
+Logged "BEGIN 70 END" (700,42)
+-}
+
+{-
+!!! from solutions with minimal
+class Monad m => MonadLogg m where
+    w2log :: String -> m ()
+    logg :: Logged a -> m a
+    w2log = logg . flip Logged ()
+
+instance Monad m => MonadLogg (LoggT m) where
+    logg = LoggT . return
+
+instance MonadLogg m => MonadLogg (StateT s m) where
+    logg = lift . logg
+
+instance MonadLogg m => MonadLogg (ReaderT s m) where
+    logg = lift . logg
+-}
