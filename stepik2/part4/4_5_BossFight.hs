@@ -14,18 +14,24 @@ f1 = undefined
 
 newtype CoroutineT m a = CoroutineT { runCoroutineT :: ContT () m a} deriving (Functor, Applicative, Monad, MonadTrans, MonadCont)
 
+idCC :: Monad m => a -> m ()
+idCC = (\_ -> pure ())
+
 runCoroutines :: Monad m => CoroutineT m () -> CoroutineT m () -> m ()
-runCoroutines = undefined
+runCoroutines c1 c2 = runContT (runCoroutineT action) idCC 
+    where
+        action = do 
+            c1
+            c2
 
 -- http://hackage.haskell.org/package/mtl-2.2.2/docs/Control-Monad-Cont.html#g:5
 -- https://hackage.haskell.org/package/transformers-0.5.6.2/docs/Control-Monad-Trans-Cont.html#v:callCC
 yield :: Monad m => CoroutineT m ()
 yield = pure ()
 
-testCC :: Monad m => a -> m ()
-testCC = (\_ -> pure ())
-testRun coro = runWriter $ (runContT . runCoroutineT $ coro) testCC
+testRun coro = runWriter $ (runContT . runCoroutineT $ coro) idCC
 tst1  = testRun coroutine4
+tst2  = testRun (coroutine4 >> coroutine3)
 
 {-
 λ: tst1
@@ -38,8 +44,7 @@ instance MonadWriter w m => MonadWriter w (CoroutineT m) where
     pass = undefined
 
 coroutine0 :: CoroutineT (Writer String) ()
-coroutine0 = do
-    tell "1"
+coroutine0 = tell "@" >> yield >> tell "$"
 
 coroutine1, coroutine2 :: CoroutineT (Writer String) ()
 coroutine1 = do
