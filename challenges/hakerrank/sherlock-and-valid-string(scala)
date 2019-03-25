@@ -14,7 +14,7 @@ def isValid(s: String): String = {
   else "YES"
 }
 
-can use pattern matching for cleaner code, e.g. see cool haskell from otрers submissions
+can use pattern matching for cleaner code, e.g. see cool haskell from topers submissions
 test :: [[Int]] -> String
 test [x] = "YES"
 test [x, [1]] = "YES"
