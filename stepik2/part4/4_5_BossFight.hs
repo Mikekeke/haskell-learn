@@ -23,9 +23,9 @@ yield :: Monad m => CoroutineT m ()
 yield = pure ()
 
 testCC :: Monad m => a -> m ()
-testCC = (\_ -> pure ())
-testRun coro = runWriter $ (runContT . runCoroutineT $ coro) testCC
-tst1  = testRun coroutine4
+testCC = const $ pure ()
+evalCoro coro = runWriter $ (runContT . runCoroutineT $ coro) return
+tst1  = evalCoro coroutine4
 
 {-
 λ: tst1
@@ -79,3 +79,25 @@ coroutine4 = do
 > execWriter (runCoroutines coroutine3 coroutine4)
 "1ab2cd"
 -}
+
+
+coroutine_1, coroutine_2 :: CoroutineT (Writer String) ()
+coroutine_1 = do
+  tell "1"
+  _ <- callCC $ \k -> do
+    tell "cc1"
+    k "Kek"
+  tell "2"
+  
+coroutine_2 = tell "a" >> yield >> tell "b"
+
+cntOneAndTwo = coroutine_1 >> coroutine_2
+
+cntOneAndTwo' :: CoroutineT (Writer String) ()
+cntOneAndTwo' = do 
+  tell "1" 
+  coroutine_2
+  tell "2" 
+
+-- runCtst :: Monad m => CoroutineT m () -> CoroutineT m () -> m ()
+-- runCtst ca cb = 
