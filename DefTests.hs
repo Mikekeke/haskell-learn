@@ -136,4 +136,15 @@ ff undefined = "2"
 "2"
 -}
 
+type RW = Int
+type EO a = RW -> (a, RW)
+
+bind :: EO a -> (a -> EO b) -> EO b
+bind m k = \rw -> let (a1,rw1) = m rw in (k a1) rw1
+-- bind m k rw = let (a1,rw1) = m rw in (k a1) rw1
+-- bind m k = \rw -> let (a1,rw1) = m rw
+--                       (a2, rw2) = k a1 rw1
+--                   in (a2, rw2)
+                      
+
 

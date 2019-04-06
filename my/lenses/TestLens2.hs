@@ -46,4 +46,5 @@ t2 = l1 & third `set` '0' -- "1204"
 
 t3 = third `view` "1234" -- '3'
 t4 = third `viewMy` "1234" -- '3'
-t5 = third `view` l2 -- 'd'
+t5 = third `view` l2 -- "asdf"
+t6 = (third . third) `view` l2 -- 'd'
