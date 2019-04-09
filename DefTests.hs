@@ -1,5 +1,6 @@
 
 -- {-# LANGUAGE FlexibleContexts #-}
+
 {-# LANGUAGE ScopedTypeVariables #-} -- for types in lambdas
 
 import System.IO
