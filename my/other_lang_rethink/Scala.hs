@@ -73,3 +73,13 @@ t4 = smt p1 p3
 tests2 = [pack t1, pack t2] -- [(P 3),(P "110")]
 
 testAll = show tests == show tests2
+
+
+-- not so polymorphic
+class Sumbl2 a b  where
+    st :: a -> b -> b
+
+instance Sumbl2 (P Integer) (P String) where
+    st (P x) (P y) = P $ show x ++ y
+
+t5 = st p1 p3

@@ -1,0 +1,82 @@
+
+A64m AL256m qn[cores], [07.04.19 13:17]
+в том примере, где рекурсия не хвостовая она и не гардед, 
+не продуктивная, так что не вижу противоречия с тем что написано
+
+ghc -O2 .\Deflt.hs -rtsopts
+run for n = 30
+
+******************************************
+fn1:
+61354575194
+   1,632,004,632 bytes allocated in the heap
+         512,912 bytes copied during GC
+          42,928 bytes maximum residency (2 sample(s))
+          26,704 bytes maximum slop
+               0 MB total memory in use (0 MB lost due to fragmentation)
+
+                                     Tot time (elapsed)  Avg pause  Max pause
+  Gen  0      1555 colls,     0 par    0.016s   0.006s     0.0000s    0.0001s
+  Gen  1         2 colls,     0 par    0.000s   0.001s     0.0005s    0.0009s
+
+  INIT    time    0.000s  (  0.001s elapsed)
+  MUT     time    2.188s  (  2.206s elapsed)
+  GC      time    0.016s  (  0.007s elapsed)
+  EXIT    time    0.000s  (  0.000s elapsed)
+  Total   time    2.203s  (  2.213s elapsed)
+
+  %GC     time       0.0%  (0.0% elapsed)
+
+  Alloc rate    746,059,260 bytes per MUT second
+
+  Productivity  99.3% of total user, 99.7% of total elapsed
+
+******************************************
+fn3:
+(61354575194,28)
+        85,296 bytes allocated in the heap
+         1,824 bytes copied during GC
+        42,928 bytes maximum residency (1 sample(s))
+        26,704 bytes maximum slop
+             0 MB total memory in use (0 MB lost due to fragmentation)
+
+                                   Tot time (elapsed)  Avg pause  Max pause
+Gen  0         0 colls,     0 par    0.000s   0.000s     0.0000s    0.0000s
+Gen  1         1 colls,     0 par    0.000s   0.002s     0.0016s    0.0016s
+
+INIT    time    0.000s  (  0.001s elapsed)
+MUT     time    0.000s  (  0.002s elapsed)
+GC      time    0.000s  (  0.002s elapsed)
+EXIT    time    0.000s  (  0.000s elapsed)
+Total   time    0.000s  (  0.004s elapsed)
+
+%GC     time       0.0%  (0.0% elapsed)
+
+Alloc rate    0 bytes per MUT second
+
+Productivity 100.0% of total user, 47.1% of total elapsed
+
+******************************************
+f1_2
+61354575194
+   1,631,971,864 bytes allocated in the heap                   use  Max pause
+         425,008 bytes copied during GC                        00s    0.0005s
+          42,928 bytes maximum residency (2 sample(s))         09s    0.0016s
+          26,704 bytes maximum slop
+               0 MB total memory in use (0 MB lost due to fragmentation)
+
+                                     Tot time (elapsed)  Avg pause  Max pause
+  Gen  0      1555 colls,     0 par    0.000s   0.006s     0.0000s    0.0005s
+  Gen  1         2 colls,     0 par    0.000s   0.002s     0.0009s    0.0016s
+
+  INIT    time    0.000s  (  0.001s elapsed)
+  MUT     time    2.234s  (  2.272s elapsed)
+  GC      time    0.000s  (  0.008s elapsed)
+  EXIT    time    0.000s  (  0.000s elapsed)
+  Total   time    2.234s  (  2.281s elapsed)
+
+  %GC     time       0.0%  (0.0% elapsed)
+
+  Alloc rate    730,393,002 bytes per MUT second
+
+  Productivity 100.0% of total user, 99.6% of total elapsed
