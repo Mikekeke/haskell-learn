@@ -2,6 +2,7 @@
 {-# LANGUAGE FunctionalDependencies #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE ExistentialQuantification #-}
+{-# LANGUAGE TypeFamilies #-}
 
 {-
 task:
@@ -49,3 +50,26 @@ pack = ConsSh
 t1 = sm p1 p2
 t2 = sm p1 p3
 tests = [pack t1, pack t2] -- [(P 3),(P "110")]
+
+{-
+another approach seen at
+https://www.youtube.com/watch?v=xVX_SAckF7Q at ~23:20
+-}
+
+class SymblTwo a b where
+    type SumTwo a b  -- TypeFamilies
+    smt :: a -> b -> SumTwo a b
+
+instance SymblTwo (P Integer) (P String) where
+    type SumTwo (P Integer) (P String) = (P String)
+    smt (P x) (P y) = P $ show x ++ y
+
+instance SymblTwo (P Integer) (P Integer)  where
+    type SumTwo (P Integer) (P Integer) = (P Integer)
+    smt (P x) (P y) = P $ x + y
+
+t3 = smt p1 p2
+t4 = smt p1 p3
+tests2 = [pack t1, pack t2] -- [(P 3),(P "110")]
+
+testAll = show tests == show tests2
