@@ -7,31 +7,24 @@ fn1 n | n < 3 = n
             r3 = 3 * fn1 (n-3)
         in r1 + r2 + r3
 
-fn3 n = if n < 3 then (n,0) else fn3' 2 1 0 n 0 where
-    fn3' a b c n' iteration | n' < 3 = (a,iteration)
-                            | otherwise = fn3' (a + 2*b + 3*c) a b (pred n') (succ iteration)
-
-
-fn1_2 n | n < 3 = n
-      | otherwise = 
-        let 
-            r1 = fn1_2 (n-1)
-            r2 = 2 * fn1_2 (n-2)
-            r3 = 3 * fn1_2 (n-3)
-            sm !a !b !c = a + b + c
-        in sm r1 r2 r3
-
-
 {-
-!!! in prelude, not compiled
-λ: fn3 20
-(10771211,18)
-(0.01 secs, 73,528 bytes)
-λ: fn1 20
-10771211
-(0.24 secs, 56,763,920 bytes)
-for compiled see stats1
+to understand why 2 1 0
+We can also formulate an iterative process for computing the Fibonacci numbers. 
+The idea is to use a pair of integers a and b, initialized to Fib(1) = 1 and Fib(0) = 0, 
+and to repeatedly apply the simultaneous transformations
+a←a+b,
+b←a.
+It is not hard to show that, after applying this transformation n times,
+ a and b will be equal, respectively, to Fib(n+1) and Fib(n)
 -}
+fn n = if n < 3 then n else fn' 2 1 0 n where
+    fn' a b c n' | n' < 3 = a
+                 | otherwise = let a' = (a + 2*b + 3*c)
+                                   b' = a 
+                                   c' = b
+                                in fn' a' b' c' (pred n')
+
+
 
 fn2 sum' n | n < 3 = sum'
            | otherwise = fn2 (n-1) sum'
@@ -59,6 +52,3 @@ fn2' sum' n cnt | n < 3 = (sum', cnt)
 4 iterations for 2 substractions
 -}
 
--- main = putStrLn (show $ fn1 30)
--- main = putStrLn (show $ fn3 30)
-main = putStrLn (show $ fn1_2 30)
