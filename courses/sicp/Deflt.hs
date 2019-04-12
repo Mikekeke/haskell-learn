@@ -1,4 +1,6 @@
 {-# LANGUAGE BangPatterns #-}
+
+
 fn1 n | n < 3 = n
       | otherwise = 
         let 
@@ -23,6 +25,18 @@ fn n = if n < 3 then n else fn' 2 1 0 n where
                                    b' = a 
                                    c' = b
                                 in fn' a' b' c' (pred n')
+
+{-from book fib-}
+-- exponent growth
+fibExp 0 = 0
+fibExp 1 = 1
+fibExp n = fibExp (n-1) + fibExp (n-2)
+
+-- ~const memory
+fibConst n = go 1 0 n where
+    go a b 0 = b
+    go a b n' = go (a+b) a (pred n')
+
 
 
 
