@@ -149,3 +149,22 @@ bind m k = \rw -> let (a1,rw1) = m rw in (k a1) rw1
                       
 
 
+data Tree a = Nil | Branch (Tree a) a (Tree a) deriving Eq
+instance Show a => Show (Tree a) where
+    show Nil = "."
+    show (Branch l x r) = "(" ++ show l ++ "(" ++ show x ++ ")" ++ show r ++ ")"
+emptyTree = Nil
+
+insert :: Ord a => a -> Tree a -> Tree a
+insert a Nil = Branch Nil a Nil
+insert a br@(Branch l x r) | a == x = br
+                           | a < x = (Branch l x (insert a r))
+                           | a > x = (Branch (insert a l) x r)
+
+delete :: Ord a => a -> Tree a -> Tree a
+delete _ Nil = Nil
+delete a (Branch l x r) | a == x = undefined
+                        | a < x = (Branch l x (delete a r))
+                        | a > x = (Branch (delete a l) x r)
+                        
+r1 = insert 10 . insert 5 . insert 20 . insert 11                              
