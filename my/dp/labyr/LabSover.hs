@@ -1,5 +1,6 @@
 import           Data.Set
 import           Debug.Trace
+import Control.Monad
 
 labFile = "./my/dp/labyr/lab1"
 parseTerrain c | c == '.' = True
@@ -54,9 +55,13 @@ findOuts lab pos seen | not (isLegalPos lab pos) = error "Illegal start position
                         list of one element to pass futher;
                         if more than one element, rest will be replicated by number of elements -}
                         if elem pos seen then [] else "z"
+                        -- or
+                        -- guard (elem pos seen)
                         newPos <- nextPoss pos
                         -- coz in case of "False" pattern match will fail, and "fail" for list monad is []
                         True <- return $ isLegalPos lab newPos
+                        -- or again
+                        -- guard (isLegalPos lab newPos)
                         nextPoss <- findOuts lab newPos (pos : seen)
                         [pos : nextPoss]
 
