@@ -12,6 +12,14 @@ f = join (*)
 -- easier analogy
 -- join (*) 4 => 16
 -- ~> (*) >>= id
+{-
+(\a -> (\b -> (a*b))) >>= id
+by signature (?)
+\a` -> id ((\a -> (\b -> (a*b))) $ a`) a`
+id ((\a -> (\b -> (a*b))) $ 4) 4
+id (\b -> (4*b)) 4
+id (4*4)
+-} 
 -- ~> \x -> id ((*) x) x
 -- ~> id ((*) 4) 4
 -- ~> id (*4) 4
