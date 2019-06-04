@@ -2,6 +2,30 @@ import           Control.Monad.Reader
 import           Control.Monad.State
 import           Control.Monad.Writer
 
+
+{-
+(>>=) :: State s a -> (a -> State s b) -> State s b
+m >>= k = state $ \s -> 
+    let
+        (a1, s1) = runState m s
+    in runState (k a1) s1
+        
+m1 >> m2 = m1 `bnd` (\_ -> m2)
+
+get' :: State s s        
+get' = state $ \s -> (s,s) 
+
+so s1 >> get will expand
+bnd s1 (\_ -> s2)
+state $ \s -> let (a1, s') = runState m s in runState (k a1) s'
+state $ \s -> let (a1, s') = runState m s in runState ((\_ -> s2) a1) s'
+state $ \s -> let (a1, s') = runState m s in runState s2 s'
+s2~get
+state $ \s -> let (a1, s') = runState m s in (\s -> (s,s)) s'
+state $ \s -> let (a1, s') = runState m s in (s',s')
+-}
+
+
 modify1 :: (s -> s) -> State s ()
 modify1 f = do
     s <- get
