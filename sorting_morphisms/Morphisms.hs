@@ -11,6 +11,10 @@ cataRev = listCata ([], \x u -> u ++ [x])
 cataRev' [] = []
 cataRev' l = listCata ([head l], \x u -> x:u) (cataRev' $ tail l)
 
+-- from SO
+rev xs = foldr (\x k -> \acc -> k (x:acc)) id xs []
+cataRev2 l = listCata (id, \x k acc -> k (x:acc)) l []
+
 type ListAna u x = u -> Maybe (x,u)
 
 listAna :: ListAna u x -> u -> [x] 
