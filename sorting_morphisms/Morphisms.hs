@@ -7,6 +7,9 @@ listCata (a,f) = cata where
 
 cataProd = listCata (1, (*))
 cataRev = listCata ([], \x u -> u ++ [x])
+-- ↓↓↓ bad perfomance, lol
+cataRev' [] = []
+cataRev' l = listCata ([head l], \x u -> x:u) (cataRev' $ tail l)
 
 type ListAna u x = u -> Maybe (x,u)
 
