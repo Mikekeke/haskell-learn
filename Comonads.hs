@@ -1,6 +1,7 @@
 {-# LANGUAGE TupleSections #-}
 
 import Data.List.NonEmpty as NE
+import Control.Monad.Identity
 
 l1 = 1 :| [2,3,4,5]
 
@@ -12,8 +13,17 @@ class Functor w => Comonad w where
     x =>> f = fmap f (cojoin x)
     extend = flip (=>>)
     -- extend f = fmap f . cojoin
+    -- cojoin wa = extend id wa
+    cojoin = extend id
 
 toNe (x:xs) = x :| xs
+
+instance Comonad Identity where
+    counit (Identity x) = x
+    cojoin = Identity
+    extend f wa = Identity (f wa)
+    -- extend f = Identity . f
+    -- extend = (Identity .)
 
 instance Comonad NonEmpty where
     counit (a :| _) = a
