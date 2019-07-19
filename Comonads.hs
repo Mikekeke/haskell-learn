@@ -2,6 +2,8 @@
 
 import Data.List.NonEmpty as NE
 import Control.Monad.Identity
+import Prelude hiding (tail)
+import Data.Function
 
 l1 = 1 :| [2,3,4,5]
 
@@ -16,7 +18,8 @@ class Functor w => Comonad w where
     -- cojoin wa = extend id wa
     cojoin = extend id
 
-toNe (x:xs) = x :| xs
+infinite :: NonEmpty Int
+infinite = fromList [0..]
 
 instance Comonad Identity where
     counit (Identity x) = x
@@ -35,7 +38,7 @@ instance Comonad NonEmpty where
         -- f (a :| as) = case as of
         --     [] -> ((a :| as), Nothing)
         --     (x:xs) -> ((a :| as), Just (x :| xs))
-        f = (,) <*> (nonEmpty . NE.tail)
+        f = (,) <*> (nonEmpty . tail)
         -- (,) :: t -> a -> (t, a)
         -- (nonEmpty . NE.tail) :: t -> a
         -- <*> :: (t -> a -> b) -> (t -> a) -> (t -> b)
@@ -48,3 +51,25 @@ instance Comonad NonEmpty where
 -- (=>=) k g = g . fmap k . cojoin
 -- or
 -- (=>=) k g = g . extend k
+
+takeS :: Int -> NonEmpty a -> [a]
+takeS n = Prelude.take n . toList
+
+-- https://www.youtube.com/watch?v=dOw7FRLVgY4&feature=youtu.be
+takeTakeS n nel = takeS n nel' where 
+    nel' :: NonEmpty [Integer]
+    nel' = extend (takeS 3) nel
+{-
+λ: takeTakeS 6 infinite 
+[[0,1,2],[1,2,3],[2,3,4],[3,4,5],[4,5,6],[5,6,7]]
+-}
+
+winAvg :: Int -> NonEmpty Int -> Double
+winAvg window = avg window . takeS window where 
+    avg :: Int -> [Int] -> Double
+    avg x l = ((/) `on` fromIntegral) (sum l) x
+
+    wrong
+rollingAvg :: Int -> NonEmpty Int -> NonEmpty Double
+rollingAvg window nel = extend (winAvg window) nel
+-- rollingAvg = extend . winAvg
