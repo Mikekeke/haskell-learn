@@ -6,6 +6,19 @@ import Prelude hiding (tail)
 import Data.Function
 
 l1 = 1 :| [2,3,4,5]
+ix = flip (NE.!!)
+
+takeS :: Int -> NonEmpty a -> [a]
+takeS n = Prelude.take n . toList
+
+-- https://www.youtube.com/watch?v=dOw7FRLVgY4&feature=youtu.be
+takeTakeS n nel = takeS n nel' where 
+    nel' :: NonEmpty [Integer]
+    nel' = extend (takeS 3) nel
+{-
+λ: takeTakeS 6 infinite 
+[[0,1,2],[1,2,3],[2,3,4],[3,4,5],[4,5,6],[5,6,7]]
+-}
 
 class Functor w => Comonad w where
     (=>>) :: w a -> (w a -> b) -> w b
@@ -52,24 +65,35 @@ instance Comonad NonEmpty where
 -- or
 -- (=>=) k g = g . extend k
 
-takeS :: Int -> NonEmpty a -> [a]
-takeS n = Prelude.take n . toList
-
--- https://www.youtube.com/watch?v=dOw7FRLVgY4&feature=youtu.be
-takeTakeS n nel = takeS n nel' where 
-    nel' :: NonEmpty [Integer]
-    nel' = extend (takeS 3) nel
+composeTest = takeS 4 =>= ix 2
 {-
-λ: takeTakeS 6 infinite 
-[[0,1,2],[1,2,3],[2,3,4],[3,4,5],[4,5,6],[5,6,7]]
+λ: Prelude.take 4 $ composeTest infinite 
+[2,3,4,5]
 -}
+
 
 winAvg :: Int -> NonEmpty Int -> Double
 winAvg window = avg window . takeS window where 
     avg :: Int -> [Int] -> Double
     avg x l = ((/) `on` fromIntegral) (sum l) x
 
-    wrong
+
 rollingAvg :: Int -> NonEmpty Int -> NonEmpty Double
 rollingAvg window nel = extend (winAvg window) nel
 -- rollingAvg = extend . winAvg
+
+{-
+takeS 5 $ (ix 2 <$> cojoin infinite) == takeS 5 $ (ix 2 $ cojoin infinite) == [2,3,4,5,6]
+-}
+
+
+data Store s a = Store (s -> a) s
+
+instance Functor (Store s) where
+    fmap f (Store g s) = Store (f . g) s
+
+instance Comonad (Store s) where
+    counit (Store f s) = f s
+    cojoin (Store f s) = Store fn s where 
+        -- fn :: s -> Store s a
+        fn = Store f
