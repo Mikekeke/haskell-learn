@@ -94,6 +94,27 @@ instance Functor (Store s) where
 
 instance Comonad (Store s) where
     counit (Store f s) = f s
-    cojoin (Store f s) = Store fn s where 
-        -- fn :: s -> Store s a
-        fn = Store f
+    -- cojoin (Store f s) = Store fn s where 
+    --     -- fn :: s -> Store s a
+    --     fn = Store f
+
+    extend f sa@(Store g s) = Store (\s1 -> f sa) s
+
+squared n = Store (\x -> x^2) n
+
+tst :: Store s Int -> String
+tst = show . counit . fmap (+1)
+{-
+λ: counit $ squared 2 =>> tst
+"5"
+λ: counit $ counit $ squared 2 =>> id
+4
+-}
+
+experiment :: Functor f => (s -> f s) -> Store s a -> f a
+experiment fn (Store g s) = fmap g $ fn s
+
+{-
+λ: experiment (\n -> [n-1,n+1]) (squared 2)
+[1,9]
+-}
