@@ -59,10 +59,17 @@ xs !!! n
 -}
 
 
--- to clarify !!
--- http://hackage.haskell.org/package/base-4.12.0.0/docs/src/GHC.List.html#%21%21
+{-to clarify !!
+http://hackage.haskell.org/package/base-4.12.0.0/docs/src/GHC.List.html#%21%21
+xs !! n
+  | n < 0     = negIndex
+  | otherwise = foldr (\x r k -> case k of
+                                   0 -> x
+                                   _ -> r (k-1)) tooLarge xs n
+-}
 
 f' x f y = if y == 1 then f x else f (y - 1)
+-- f' x f = \y -> if y == 1 then f x else f (y - 1)
 fff = foldr (\x f y -> if y == 1 then f x else f (y - 1)) show [10..11]
 --    foldr (\x f -> \y -> ...)
 {-
