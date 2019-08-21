@@ -36,7 +36,7 @@ findM k (x:xs) = f <$> (k x) <*> (findM k xs) where
 
 findM' :: Monad m => (a -> m Bool) -> [a] -> m (Maybe a)
 findM' k l = foldr (\a b -> f a <$> k a <*> b) (pure Nothing) l where
-    f v x' = if x' then const (Just v) else id
+    f v x' = if x' then const (Just v) else trace "CALL" id
 
 findM'' :: (Monad m, Show a) => (a -> m Bool) -> [a] -> m (Maybe a)
 findM'' k l = foldr (\a -> liftA2 (f a) (k a)) (pure Nothing) l where
