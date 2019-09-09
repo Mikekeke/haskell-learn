@@ -44,3 +44,25 @@ lSuff1 s t = snd $ Prelude.foldr (\c (t1, acc1) -> undefined) (t,"") (reverse s)
 
 mp = add "dog" . add "dot" . add "dororo" $ emptyT
 tst1 = lSuff1 "doroga" mp
+
+restore :: Trie Char -> [String]
+restore = go [] [] where 
+    go :: [String] -> String -> Trie Char -> [String]
+    go acc path (Trie m) | M.null m = (reverse path) : acc
+                         | otherwise = do
+                            key <- keys m
+                            go acc (key:path) (m ! key)
+
+restore2 :: Trie Char -> [String]
+restore2 = go [] id where 
+    go :: [String] -> (String -> String) -> Trie Char -> [String]
+    go acc f (Trie m) | M.null m = (f []) : acc
+                      | otherwise = do
+                            key <- keys m
+                            go acc (f . (key :)) (m ! key)
+
+-- learn QuckCheck
+testAll = mapM_ (putStrLn . show) $
+    [
+        ("retires equality", restore mp == restore2 mp)
+    ]
