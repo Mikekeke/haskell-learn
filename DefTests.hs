@@ -167,4 +167,27 @@ delete a (Branch l x r) | a == x = undefined
                         | a < x = (Branch l x (delete a r))
                         | a > x = (Branch (delete a l) x r)
                         
-r1 = insert 10 . insert 5 . insert 20 . insert 11                              
+r1 = insert 10 . insert 5 . insert 20 . insert 11  
+
+
+fr f z [] = z
+fr f z (x:xs) = f x (fr f z xs)
+
+fl f z [] = z
+fl f z (x:xs) = fl f (f x z) xs
+
+
+
+
+rev xs = foldr (\x k -> \acc -> k (x:acc)) id xs []
+{-
+foldr (\x k -> \acc -> k (x:acc)) id [1,2] $ []
+(\x k -> \acc -> k (x:acc)) 1 $ foldr (\x k -> \acc -> k (x:acc)) id [2] $ []
+(\x k -> \acc -> k (x:acc)) 1 $ (\x k -> \acc -> k (x:acc)) 2 $ foldr (\x k -> \acc -> k (x:acc)) id [] $ []
+(\x k -> \acc -> k (x:acc)) 1 $ (\x k -> \acc -> k (x:acc)) 2 $ id $ []
+(\x k -> \acc -> k (x:acc)) 1 $ (\acc' -> id (2:acc')) $ []
+(\x k -> \acc -> k (x:acc)) 1 $ (\acc' -> 2:acc') $ []
+(\x k -> \acc -> k (x:acc)) 1 $ (2:) $ []
+(\acc -> (2:(1:acc))) $ []
+(2:(1:[])))
+-}
