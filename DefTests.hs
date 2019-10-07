@@ -191,3 +191,9 @@ foldr (\x k -> \acc -> k (x:acc)) id [1,2] $ []
 (\acc -> (2:(1:acc))) $ []
 (2:(1:[])))
 -}
+
+pickFun x | even x = x / 2
+          | odd x = x * 3 + 1
+
+collaz x | x == 1 = 1
+       | otherwise = step $ (pickFun x) 
