@@ -2,6 +2,7 @@
 -- {-# LANGUAGE FlexibleContexts #-}
 
 {-# LANGUAGE ScopedTypeVariables #-} -- for types in lambdas
+{-# LANGUAGE RecordWildCards  #-} -- for types in lambdas
 
 import System.IO
 import Data.IORef
@@ -13,6 +14,7 @@ import Control.Exception as Ex
 import Control.Applicative
 import Data.Monoid
 import Debug.Trace
+import qualified Data.List as L
 
 type Entry = ([Char], ([Char], [Integer]))
 -- ex :: [Entry]
@@ -192,8 +194,26 @@ foldr (\x k -> \acc -> k (x:acc)) id [1,2] $ []
 (2:(1:[])))
 -}
 
-pickFun x | even x = x / 2
-          | odd x = x * 3 + 1
+-- pickFun x | even x = x / 2
+--           | odd x = x * 3 + 1
 
-collaz x | x == 1 = 1
-       | otherwise = step $ (pickFun x) 
+-- collaz x | x == 1 = 1
+--        | otherwise = step $ (pickFun x) 
+
+data Player = Player {cards :: [Int]} deriving Show
+noCards = Player []
+lss = [noCards, noCards]
+
+nums :: [Int]
+nums = [1..10]
+putCard Player {..} c = Player {cards = c:cards, ..}
+
+spread players nums = let
+    playersCount = length players
+    go _ ps [] = ps
+    go n ps cs = let (curr, rest) = splitAt n cs in go n (zipWith putCard ps curr) rest
+    in go playersCount (cycle players) nums
+
+caseFun s = case s of 
+    _ | length s > 1 -> "ok"
+      | otherwise -> "nok"
