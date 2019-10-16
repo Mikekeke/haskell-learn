@@ -27,14 +27,14 @@ res2' = do
 res2 = filter ((10 ==) . sum) $ res2'
 -- (0.01 secs, 848,576 bytes)
 
-go ln sm l = do
+go ln sum' l = do
     if ln < 8 then do
-        guard (sm < 10)
+        guard (sum' < 10)
         b <- coins
         guard (head l <= b)
-        go (succ ln) (sm + b) (b:l)
+        go (succ ln) (sum' + b) (b:l)
     else do
-        guard (sm == 10)
+        guard (sum' == 10)
         return l
 
 res3 = coins >>= \c1 -> go 1 c1 [c1]
