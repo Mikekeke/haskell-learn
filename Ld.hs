@@ -1,4 +1,5 @@
 import Data.List
+import Control.Monad
 
 
 
@@ -36,3 +37,10 @@ ld (o:os) (c:cs) | o == c = ld os cs
 ld w1 w2 = succ . minimum . fmap process $ [change, add, remove] where
 -- ld w1 w2 = 1 +  (minimum . fmap process $ [chL1, addL1, rmL1]) where
     process = (uncurry ld) . (\f -> f w1 w2)
+
+
+fnd1 x = foldr (\x' b -> if x == x' then Just x else b ) Nothing
+
+
+res = mapM_ (putStrLn . show) . filter ((10 ==) . sum) . nub . fmap sort . replicateM 8 $ [0.5,1,2,5]
+
