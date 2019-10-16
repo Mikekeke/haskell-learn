@@ -1,3 +1,6 @@
+import Data.List
+import Control.Monad
+
 coins = [0.5,1,2,5]
 
 res = filter ((10 ==) . sum) . nub . fmap sort . replicateM 8 $ coins
@@ -24,17 +27,18 @@ res2' = do
 res2 = filter ((10 ==) . sum) $ res2'
 -- (0.01 secs, 848,576 bytes)
 
-go sm l = do
-    if length l < 8 then do
+go ln sm l = do
+    if ln < 8 then do
+        guard (sm < 10)
         b <- coins
         guard (head l <= b)
-        guard (sm < 10)
-        go (sm + b) (b:l)
+        go (succ ln) (sm + b) (b:l)
     else do
-        guard (sum l == 10)
+        guard (sm == 10)
         return l
 
-res3 = coins >>= \c1 -> go c1 [c1]
--- (0.01 secs, 739,368 bytes)
+res3 = coins >>= \c1 -> go 1 c1 [c1]
+-- (0.01 secs, 739,368 bytes) -- before "length l" was substituted by "ln" argument and "guard (sm < 10)" moved up
+-- (0.01 secs, 609,520 bytes) -- current
 
 allEq = all (res==) [res2, reverse <$> res3]
