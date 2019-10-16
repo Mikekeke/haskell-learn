@@ -41,6 +41,3 @@ ld w1 w2 = succ . minimum . fmap process $ [change, add, remove] where
 
 fnd1 x = foldr (\x' b -> if x == x' then Just x else b ) Nothing
 
-
-res = mapM_ (putStrLn . show) . filter ((10 ==) . sum) . nub . fmap sort . replicateM 8 $ [0.5,1,2,5]
-
