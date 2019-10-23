@@ -81,7 +81,10 @@ toGetter f fcf = contramap f . fcf . f
 thirdsGetter :: Getter [a] [a]
 thirdsGetter = toGetter thirds
 
-tst3 = quickCheck (liftA2 (==) thirds (view' thirdsGetter) :: [Int] -> Bool)
+tst3 = sequence_  [
+    quickCheck (liftA2 (==) thirds (view' thirdsGetter) :: [Int] -> Bool)
+  , quickCheck (liftA2 (==) fst (view' fstGetter) :: (Int,Int) -> Bool)
+  ]
 
 
 {- well... the correct answer was just to write
