@@ -58,6 +58,15 @@ instance Functor (Const m)
 instance Contravariant (Const m)
   where contramap _ (Const b) = Const b
 
+{- 
+view' :: Getter (a,b) a -> (a,b) -> a  
+view' getter s = getConst $ getter Const s
+
+well... the correct answer was just to write polymorphic
+(^.) :: s -> Getter s a -> a
+s ^. g  = getConst (g Const s)
+-}
+
 view' :: Getter s a -> s -> a  
 view' getter s = getConst $ getter Const s
 
@@ -87,7 +96,3 @@ tst3 = sequence_  [
   ]
 
 
-{- well... the correct answer was just to write
-(^.) :: s -> Getter s a -> a
-s ^. g  = getConst (g Const s)
--}
