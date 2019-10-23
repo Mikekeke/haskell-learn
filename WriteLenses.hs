@@ -1,7 +1,10 @@
 {-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE FlexibleContexts #-}
 
 import Test.QuickCheck
 import Control.Applicative hiding (Const, getConst)
+import Data.List
 
 -- https://vitez.me/building-lenses
 newtype SimpleGetter s a = SimpleGetter (s -> a)
@@ -55,34 +58,30 @@ instance Functor (Const m)
 instance Contravariant (Const m)
   where contramap _ (Const b) = Const b
 
-fstlGetter :: Getter (a,b) a
-fstlGetter f t = contramap fst cf where
-    cf = (f . fst $ t)
-
-view' :: Getter (a, b) a -> (a, b) -> a  
+view' :: Getter s a -> s -> a  
 view' getter s = getConst $ getter Const s
 
-tt :: Getter (a,b) a
-tt k (a,b) = fmap (\a' -> (a',b)) (k a) 
+fstGetter :: Getter (a,b) a
+fstGetter fcf tpl = contramap fst $ fcf (fst tpl)
 
--- не работает
-ttl :: Getter [a] a
-ttl k (a:r) = fmap (\a' -> (a':r)) (k a) 
+headGetter :: Getter [a] a
+headGetter fcf = contramap head . fcf . head
 
 
--- tplView :: (a, b) -> a
--- tplView = view' tt
+nths :: Int -> [a] -> [a]
+nths n l = let (_,r) = splitAt (pred n) l in 
+    case r of 
+      [] -> []
+      (x:rest) -> x : nths n rest
 
--- view1 g s  = getConst (g Const s)
+thirds = nths 3
 
--- headGetter :: Getter [a] a
--- headGetter f t = contramap head cf where
---     cf = (f . head $ t)
+toGetter f fcf = contramap f . fcf . f
 
--- headV :: [a] -> a
--- headV = view1 headGetter
+thirdsGetter :: Getter [a] [a]
+thirdsGetter = toGetter thirds
 
--- tst3 = view1 (headV . tplView )
+tst3 = quickCheck (liftA2 (==) thirds (view' thirdsGetter) :: [Int] -> Bool)
 
 
 {- well... the correct answer was just to write
