@@ -1,7 +1,10 @@
 {-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE FlexibleContexts #-}
 
 import Test.QuickCheck
 import Control.Applicative hiding (Const, getConst)
+import Data.List
 
 -- https://vitez.me/building-lenses
 newtype SimpleGetter s a = SimpleGetter (s -> a)
@@ -55,39 +58,41 @@ instance Functor (Const m)
 instance Contravariant (Const m)
   where contramap _ (Const b) = Const b
 
-fstlGetter :: Getter (a,b) a
-fstlGetter f t = contramap fst cf where
-    cf = (f . fst $ t)
-
-view' :: Getter (a, b) a -> (a, b) -> a  
+{- 
+view' :: Getter (a,b) a -> (a,b) -> a  
 view' getter s = getConst $ getter Const s
 
--- tt :: Getter (a,b) a
--- tt k (a,b) = fmap (\a' -> (a',b)) (k a) 
-tt :: (a, t) -> Const a (b,t)
-tt (a,b) = (Const a) 
-
--- не работает
-ttl :: Getter [a] a
-ttl k l = contramap head (k . head $ l) 
-
-
--- tplView :: (a, b) -> a
--- tplView = view' tt
-
-view1 g s  = getConst (g Const s)
-
--- headGetter :: Getter [a] a
--- headGetter f t = contramap he:tad cf where
---     cf = (f . head $ t)
-
--- headV :: [a] -> a
--- headV = view1 headGetter
-
--- tst3 = view1 (headV . tplView )
-
-
-{- well... the correct answer was just to write
+well... the correct answer was just to write polymorphic
 (^.) :: s -> Getter s a -> a
 s ^. g  = getConst (g Const s)
 -}
+
+view' :: Getter s a -> s -> a  
+view' getter s = getConst $ getter Const s
+
+fstGetter :: Getter (a,b) a
+fstGetter fcf tpl = contramap fst $ fcf (fst tpl)
+
+headGetter :: Getter [a] a
+headGetter fcf = contramap head . fcf . head
+
+
+nths :: Int -> [a] -> [a]
+nths n l = let (_,r) = splitAt (pred n) l in 
+    case r of 
+      [] -> []
+      (x:rest) -> x : nths n rest
+
+thirds = nths 3
+
+toGetter f fcf = contramap f . fcf . f
+
+thirdsGetter :: Getter [a] [a]
+thirdsGetter = toGetter thirds
+
+tst3 = sequence_  [
+    quickCheck (liftA2 (==) thirds (view' thirdsGetter) :: [Int] -> Bool)
+  , quickCheck (liftA2 (==) fst (view' fstGetter) :: (Int,Int) -> Bool)
+  ]
+
+
