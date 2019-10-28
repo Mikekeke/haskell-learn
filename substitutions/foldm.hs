@@ -4,8 +4,7 @@ import Data.Foldable
 
 foldrM' :: forall a b t m . (Foldable t, Monad m) => (a -> b -> m b) -> b -> t a -> m b
 foldrM' f z xs = foldr f' return xs z where
-    -- f' :: a -> (b -> m b) -> b -> m b
-    f' :: a -> (b -> m b) -> b -> m b
+    f' :: a -> (b -> m b) -> b -> m b -- forall and pragma to enable this signature
     f' x k z' = f x z' >>= k
 
 t1 = foldrM' (\a b -> Just (a:b)) [] [1,2]
