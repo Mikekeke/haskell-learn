@@ -62,21 +62,23 @@ fstlGetter f t = contramap fst cf where
 view' :: Getter (a, b) a -> (a, b) -> a  
 view' getter s = getConst $ getter Const s
 
-tt :: Getter (a,b) a
-tt k (a,b) = fmap (\a' -> (a',b)) (k a) 
+-- tt :: Getter (a,b) a
+-- tt k (a,b) = fmap (\a' -> (a',b)) (k a) 
+tt :: (a, t) -> Const a (b,t)
+tt (a,b) = (Const a) 
 
 -- не работает
 ttl :: Getter [a] a
-ttl k (a:r) = fmap (\a' -> (a':r)) (k a) 
+ttl k l = contramap head (k . head $ l) 
 
 
 -- tplView :: (a, b) -> a
 -- tplView = view' tt
 
--- view1 g s  = getConst (g Const s)
+view1 g s  = getConst (g Const s)
 
 -- headGetter :: Getter [a] a
--- headGetter f t = contramap head cf where
+-- headGetter f t = contramap he:tad cf where
 --     cf = (f . head $ t)
 
 -- headV :: [a] -> a
