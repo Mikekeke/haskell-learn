@@ -2,6 +2,8 @@ import Text.Parsec
 import Data.Char
 import Data.Monoid
 import Control.Applicative (liftA2)
+import Data.Function
+import Control.Monad
 
 data Abc = Abc Char Char Char deriving Show
 getChr n s = s !! n
@@ -104,3 +106,19 @@ runTestsV = printTestsFor tstParsePersV
 
 -- double Applicative - END
 
+s1 = "34TomTest"
+pointers :: Parsec String u (Int, Int)
+pointers = join (liftA2 (,)) (digitToInt <$> digit)
+
+parseN ::  Int -> Parsec String u a -> Parsec String u [a]
+parseN n p = replicateM n p
+parseNChar n = parseN n anyChar
+
+directedParse lenA lenB = liftA2 (,) (parseNChar lenA) (parseNChar lenB)
+
+parseS1 = runParser p () "" s1 where
+    p = pointers `parserBind` (uncurry directedParse)
+{-
+λ: parseS1
+Right ("Tom","Test")
+-}
