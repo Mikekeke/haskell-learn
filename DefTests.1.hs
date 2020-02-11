@@ -1,5 +1,6 @@
 {-# LANGUAGE ConstrainedClassMethods #-}
-
+module DefTests1 where
+    
 import Control.Monad.State
 import Data.Map as M
 import Control.Monad.State
@@ -51,3 +52,8 @@ solveST s1@(x:xs) s2@(y:ys)
                 return res
 
 
+
+data SyncRes = SuncSuccess | SyncFail {errors :: [String]}
+
+pres :: SyncRes -> String
+pres sr = show (errors sr)

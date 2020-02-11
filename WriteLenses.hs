@@ -87,6 +87,19 @@ thirds = nths 3
 
 toGetter f fcf = contramap f . fcf . f
 
+{-!!! from conversation with author
+https://github.com/mitchellvitez/building-lenses/blob/9ed0c4f4b0c26780cd289623fb3115aa00710df2/Getter.hs#L55
+
+type Getter s a =
+  forall r. (a -> Const r a) -> s -> Const r s
+
+toGetter get f = Const . getConst . f . get
+
+cool pattern matching
+everyThird (_:_:x:xs) = x : everyThird xs
+everyThird _          = []
+-}
+
 thirdsGetter :: Getter [a] [a]
 thirdsGetter = toGetter thirds
 

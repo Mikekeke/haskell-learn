@@ -1,6 +1,7 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 
 import Data.Foldable
+import Control.Applicative
 
 foldrM' :: forall a b t m . (Foldable t, Monad m) => (a -> b -> m b) -> b -> t a -> m b
 foldrM' f z xs = foldr f' return xs z where
@@ -20,3 +21,14 @@ t8 = (Just (2:1:[]) >>= return)
 t9 = Just (2:1:[])
 
 tst = all (t1 ==) [t2,t3,t4,t5,t6,t7,t8,t9]
+
+fish :: Monad m => (a -> m b) -> (b -> m c) -> (a -> m c)
+-- fish k1 k2 a = k1 a >>= k2
+fish k1 k2 = \a -> k1 a >>= k2
+
+foldrM'' :: forall a b t m . (Foldable t, Monad m) => (a -> b -> m b) -> b -> t a -> m b
+-- foldrM'' f z xs = foldr (\a b -> f a `fish` b) return xs z
+foldrM'' f z xs = foldr (fish . f) return xs z
+
+fn a b = Just (a+b)
+tst2 = liftA2 (==) (foldrM' fn 0) (foldrM'' fn 0) [1,2,3]
