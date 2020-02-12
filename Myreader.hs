@@ -40,12 +40,12 @@ reader2 = do
 3
 -}
 
-reader3 :: Reader [a] (Int, Int)
+reader3 :: Reader String (String, Int)
 reader3 = do
-    x1 <- local tail ask
+    x1 <- local (filter (> 'a')) ask >>= return . (++ "!!")
     x2 <- ask
-    return (length x1, length x2)
+    return (x1, length x2)
 {-
 λ: runReader reader3 "asd"
-(2,3)
+("sd!!",3)
 -}
