@@ -1,6 +1,6 @@
 import Control.Monad
 
-data Reader r a = Reader {runReader :: r -> a}
+newtype Reader r a = Reader {runReader :: r -> a}
 
 instance Functor (Reader r) where
     fmap = liftM
