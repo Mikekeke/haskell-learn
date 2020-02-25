@@ -50,3 +50,16 @@ filteringMb = filtering tOpt
 -- > let fn =  filter <$> (flip (>))
 -- > fn 3 [1,2,3,4]
 -- [4]
+
+
+filtering1 :: Applicative f => (a -> f Bool) -> [a] -> f [a]
+filtering1 k [] = pure []
+filtering1 k (x:xs) = fn <$> k x <*> filtering1 k xs where
+  fn p = if p then (x:) else id
+
+{-
+λ: (take 1) <$> (filtering1 (\x -> if x < 20 then Just True else Nothing) [1..])
+Nothing
+λ: (take 1) <$> (filtering1 (\x -> if x < 20 then Just True else Nothing) [1..5])
+Just [1]
+-}

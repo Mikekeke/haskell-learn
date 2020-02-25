@@ -1,8 +1,8 @@
 import qualified Data.Map.Strict as M
 import           GHC.Arr         as A
 
--- track = "101110101010111101010101111111111111111010101111111110101"
-track = "1011101010101"
+track = "101110101010111101010101111111111111111010101111111110101"
+-- track = "1011101010101"
 -- track = "1110101"
 convert '1' = True
 convert '0' = False
